@@ -170,7 +170,7 @@
 
 #prob([
   Translate the following expression into prefix #image(
-    "1-2.png", width: 30%,format: "png",
+    "images/1-2.png", width: 30%,format: "png",
   )
 ])
 
