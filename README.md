@@ -1,1 +1,1 @@
-[SICP](./images/fumo.webp)
+[![SICP](./images/fumo.webp)](./sicp.pdf)
