@@ -1,5 +1,5 @@
 #set page(
-  numbering: "-1-",
+  numbering: "--[1]--",
   margin: 3em,
 )
 
@@ -605,8 +605,52 @@ we are using the identity $sin(3x) = 3sin(x)-4sin^3(x)$
   (define (exponent base n)
     (helperiter 1 base n))
   (define (helperiter acc base n)
-    (if ((= n 0) acc)
-        (helperiter (* acc base) base (- n 1))))
-  ; i have no clue how tf the observation is gonna be used ;-;
+    (cond ((= n 0) acc)
+          ((= (remainder n 2) 0) (helperiter acc (* base base) (/ n 2))) ;if the exponent is a multiple of 2 then do b^n = (b*b)^(n/2)
+          (helperiter (* acc base) base (- n 1))))
   ```
+])
+
+#prob([
+  The exponentiation algorithms in this section are based on performing exponentiation by means of repeated multiplication. In a similar way, one can perform integer multiplication by means of repeated addition. The following multiplication procedure (in which it is assumed that our language can only add, not multiply) is analogous to the expt procedure:
+  ```lisp
+  (define (* a b)
+    (if (= b 0) 0
+        (+ a (* a (- b 1)))))
+  ```
+  this algorithm takes a number of steps that is linear in b. Now suppose we include, together with addition, operations double, which doubles an integer, and halve, which divides an (even) integer by 2. Using these, design a multiplication procedure analogous to fast-expt that uses a logarithmic number of steps.
+])
+
+#answer([
+we can do something like $a b = (2a)(b/2)$ for even $b$ (because we are given the procedures _double_ and _half_)\
+and the previous same procedure for odd $b$
+
+```lisp
+(define (even? n)
+  (= (remainder n 2) 0))
+
+(define (* a b)
+  (cond ((= b 0) 0)
+        ((even? b) (* (double a) (half 2)))
+        (else (+ a (* a (- b 1))))))
+```
+])
+
+#prob([
+  Using the results of Exercise 1.16 and Exercise 1.17, devise a procedure that generates an iterative process for multiplying two integers in terms of adding, doubling, and halving and uses a logarithmic number of steps.
+])
+
+#answer([
+  we know that in iterative processes we need an accumulator a counter and some number of other arguements for operations, so let's make one of the multiplication arguements as the counter, something like
+```lisp
+(define (multiply a b)
+  (define (iterator acc a b)
+    (cond ((= b 0) acc)
+          ((even? b) (iterator acc (double a) (half b)))
+          (else (iterator (+ acc a) a (- b 1)))))
+  (iterator 0 a b))
+```
+])
+
+#prob([
 ])
