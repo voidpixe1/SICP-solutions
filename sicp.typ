@@ -101,12 +101,12 @@
       columns: (auto, auto, auto),
       inset: 4pt,
       align: center,
-      table.header( [*Product*], [*Counter*], [*Input*],),
-      [1], [1], [4],
-      [1], [2], [4],
-      [2], [3], [4],
+      table.header( [*Product*], [*Input*], [*Counter*],),
+      [1], [4], [1],
+      [1], [4], [2],
+      [2], [4], [3],
       [6], [4], [4],
-      [24], [5], [4],
+      [24], [4], [5],
     ) ]
   )
   
@@ -121,7 +121,7 @@
 ])
 
 #prob[
- Exercise 1.1 
+  What is the result printed by the interpreter in response to each expression?
 ]
 
 #answer([
@@ -653,4 +653,188 @@ and the previous same procedure for odd $b$
 ])
 
 #prob([
+There is a clever algorithm for computing the Fibonacci numbers in a logarithmic number of steps. Recall the transformation of the state variables $a$ and $b$ in the fib-iter process of 1.2.2:
+
+$ a <- a + b $
+$ b <- a $
+
+Call this transformation $T$, and observe that applying $T$ over and over again $n$ times, starting with $1$ and $0$, produces the pair $"Fib"(n+1)$ and $"Fib"(n)$. In other words, the Fibonacci numbers are produced by applying $T^n$, the $n^("th")$ power of the transformation $T$, starting with the pair $(1, 0)$.
+
+Now consider $T$ to be the special case of $p = 0$ and $q = 1$ in a family of transformations $T_(p q)$ where $T_(p q)$ transforms the pair $(a, b)$ according to:
+
+$ a <- b q + a q + a p $
+$ b <- b p + a q $
+
+Show that if we apply such a transformation $T_(p q)$ twice, the effect is the same as using a single transformation $T_(p' q')$ of the same form, and compute $p'$ and $q'$ in terms of $p$ and $q$. This gives us an explicit way to square these transformations, and thus we can compute $T^n$ using successive squaring.
+  ```lisp
+(define (fib n)
+  (fib-iter 1 0 0 1 n))
+(define (fib-iter a b p q count)
+  (cond ((= count 0) b)
+    ((even? count)
+     (fib-iter a
+               b
+               <??> ; compute p′
+               <??> ; compute q′
+               (/ count 2)))
+    (else (fib-iter (+ (* b q) (* a q) (* a p))
+                    (+ (* b p) (* a q))
+                    p
+                    q
+                    (- count 1)))))
+  ```
+])
+
+#answer([
+  let us say there is a matrix $T_(p q)$, then according to the question this matrix _transforms_ the matrix (in question called pair) $mat(a;b)$ as follows:
+
+  #set math.mat(delim: "[")
+  #set math.mat(column-gap: 1em)
+  #set math.mat(row-gap: 0.5em)
+  $ T_(p q) mat(a;b) = mat(b q + a q + a p;b p + a q) $
+  $ T_(p q) mat(a;b) = mat(a(p + q) + b q;a q + b p) $
+  $ T_(p q) mat(a;b) = mat(a;b) mat(p + q,q;q,p) $
+  $ T_(p q) = mat(p + q,q;q,p) $
+
+  and according to question we need to show that $T_(p q)^2$ ($T_(p q)$ used 2 times) is equivalent to some $T_(p^' q^')$, so:
+
+  $ T_(p q)^2 = mat(p + q,q;q,p)^2 $
+  $ T_(p q)^2 = mat(p^2 + 2p q + 2q^2, 2p q + q^2; 2p q + q^2, q^2 + p^2 ) $
+  $ T_(p q)^2 = T_((2p q+ q^2)(q^2 + p^2)) $
+
+  now just shove it in the code and _noice_
+  ```lisp
+(define (fib n)
+  (fib-iter 1 0 0 1 n))
+(define (fib-iter a b p q count)
+  (cond ((= count 0) b)
+    ((even? count)
+     (fib-iter a
+               b
+               (+ (* 2 p q) (* q q)) ; compute p′
+               (+ (* q q) (* p p)) ; compute q′
+               (/ count 2)))
+    (else (fib-iter (+ (* b q) (* a q) (* a p))
+                    (+ (* b p) (* a q))
+                    p
+                    q
+                    (- count 1)))))
+  ```
+])
+
+#prob([
+  The process that a procedure generates is of course dependent on the rules used by the interpreter. As an example, consider the iterative gcd procedure given above. Suppose we were to interpret this procedure using normal-order evaluation, as discussed in 1.1.5. (The normal-order-evaluation rule for if is described in Exercise 1.5.) Using the substitution method (for normal order), illustrate the process generated in evaluating (gcd 206 40) and indicate the remainder operations that are actually performed. How many remainder operations are actually performed in the normal-order evaluation of (gcd 206 40)? In the applicative-order evaluation?
+])
+
+#answer([
+  - for normal order evaluation it will be
+  ```lisp
+  ;i AM NOT WRITING THAT WTF it will take ages bro
+  ```
+  - for applicative order of evaluation
+  ```lisp
+  ; ok fuck this i saw everywhere and everyone has a different answer? wtf?
+  ```
+])
+
+#prob([
+Use the smallest-divisor procedure to find the smallest divisor of each of the following numbers: 199, 1999, 19999.
+])
+
+#answer([
+```lisp
+(define (smallest-divisor n) (find-divisor n 2))
+
+(define (divides? a b)
+  (= (remainder b a) 0))
+
+(define (find-divisor n test-divisor)
+  (cond ((> (* test-divisor test-divisor) n) n)
+        ((divides? test-divisor n) test-divisor)
+        (else (find-divisor n (+ test-divisor 1)))))
+
+(smallest-divisor 199)
+;199
+(smallest-divisor 1999)
+;;1999
+(smallest-divisor 7)
+;7
+```
+])
+
+#prob([
+Most Lisp implementations include a primitive called runtime that returns an integer that specifies the amount of time the system has been running (measured, for example, in microseconds). The following timed-prime-test procedure, when called with an integer prints and checks to see if is prime. If is prime, the procedure prints three asterisks followed by the amount of time used in performing the test.
+```lisp
+(define (timed-prime-test n)
+  (newline)
+  (display n)
+  (start-prime-test n (runtime)))
+
+(define (start-prime-test n start-time)
+  (if (prime? n)
+      (report-prime (- (runtime) 
+                       start-time))))
+(define (report-prime elapsed-time)
+  (display " *** ")
+  (display elapsed-time))
+```
+Using this procedure, write a procedure  search-for-primes  that checks the primality of consecutive odd integers in a specified range. Use your procedure to find the three smallest primes larger than 1000; larger than 10,000; larger than 100,000; larger than 1,000,000. Note the time needed to test each prime. Since the testing algorithm has order of growth of $Theta(sqrt(n))$ you should expect that testing for  primes around 10,000 should take about $sqrt(10)$ times as long as testing for primes around 1000. Do your timing data bear this out? How well do the data for 100,000 and 1,000,000 support the $Theta(sqrt(n))$ prediction? Is your result compatible with the notion that programs on your machine run in time proportional to the number of steps required for the computation?  
+])
+
+#answer([
+  there actually isn't a runtime primitive in racket _(because i couldn't get scheme to work on my machine)_, BUT there is _current-milliseconds_ which i _think_ does the same stuff?
+  ```lisp
+(define (find-divisor n test-divisor)
+  (cond ((> (* test-divisor test-divisor) n) n)
+        ((divides? test-divisor n) test-divisor)
+        (else (find-divisor n (next-divisor test-divisor)))))
+
+(define (smallest-divisor n)
+  (find-divisor n 2))
+
+(define (prime? n)
+  (= n (smallest-divisor n)))
+
+(define (next-divisor test-divisor)
+  (cond ((= test-divisor 2) 3)
+        (else (+ test-divisor 2))))
+
+(define (timed-prime-test n start-time)
+  (cond ((prime? n)
+         (display n)
+         (display "is a prime | found in ")
+         (display (- (current-milliseconds) start-time))
+         (newline)
+         #t)
+        (else #f)))
+
+
+(define (primes-larger-than n x)
+  (cond ((= x 0) #f)
+        (else (cond ((timed-prime-test n (current-milliseconds)) (primes-larger-than (+ n 1) (- x 1)))
+                    (else (primes-larger-than (+ n 1) x))))))
+
+(primes-larger-than 100000000 3)
+;100000007 is a prime | found in 0
+;100000037 is a prime | found in 0
+;100000039 is a prime | found in 0
+;#f
+
+(primes-larger-than 1000000000 3)
+;1000000007 is a prime | found in 0
+;1000000009 is a prime | found in 0
+;1000000021 is a prime | found in 0
+;#f
+
+(primes-larger-than 10000000000 3)
+;10000000019 is a prime | found in 0
+;10000000033 is a prime | found in 0
+;10000000061 is a prime | found in 0
+;#f
+  ```
+  ummmmm so this is awkward, uhhhhhhh my machine is _too powerful_ for the current-milliseconds to be counted so it just returns 0 for everytime welp............fuck
+])
+
+#prob([
+The `smallest-divisor` procedure shown at the start of this section does lots of needless testing: After it checks to see if the number is divisible by 2 there is no point in checking to see if it is divisible by any larger even numbers. This suggests that the values used for `test-divisor` should not be 2, 3, 4, 5, 6, …, but rather 2, 3, 5, 7, 9, …. To implement this change, define a procedure next that returns 3 if its input is equal to 2 and otherwise returns its input plus 2. Modify the `smallest-divisor` procedure to use `(next test-divisor)` instead of `(+ test-divisor 1)`. With `timed-prime-test` incorporating this modified version of `smallest-divisor`, run the test for each of the 12 primes found in Exercise 1.22. Since this modification halves the number of test steps, you should expect it to run about twice as fast. Is this expectation confirmed? If not, what is the observed ratio of the speeds of the two algorithms, and how do you explain the fact that it is different from 2?
 ])
