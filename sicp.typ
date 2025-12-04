@@ -784,33 +784,32 @@ Using this procedure, write a procedure  search-for-primes  that checks the prim
 #answer([
   there actually isn't a runtime primitive in racket _(because i couldn't get scheme to work on my machine)_, BUT there is _current-milliseconds_ which i _think_ does the same stuff?
   ```lisp
+(define (smallest-divisor n)
+  (find-divisor n 2))
+
 (define (find-divisor n test-divisor)
   (cond ((> (* test-divisor test-divisor) n) n)
         ((divides? test-divisor n) test-divisor)
-        (else (find-divisor n (next-divisor test-divisor)))))
+        (else (find-divisor n (+ test-divisor 1)))))
 
-(define (smallest-divisor n)
-  (find-divisor n 2))
+(define (divides? a b)
+  (= (remainder b a) 0))
 
 (define (prime? n)
   (= n (smallest-divisor n)))
 
-(define (next-divisor test-divisor)
-  (cond ((= test-divisor 2) 3)
-        (else (+ test-divisor 2))))
-
 (define (timed-prime-test n start-time)
   (cond ((prime? n)
+
          (display n)
          (display "is a prime | found in ")
          (display (- (current-milliseconds) start-time))
          (newline)
-         #t)
-        (else #f)))
-
+         true)
+        (else false)))
 
 (define (primes-larger-than n x)
-  (cond ((= x 0) #f)
+  (cond ((= x 0) false)
         (else (cond ((timed-prime-test n (current-milliseconds)) (primes-larger-than (+ n 1) (- x 1)))
                     (else (primes-larger-than (+ n 1) x))))))
 
@@ -837,4 +836,68 @@ Using this procedure, write a procedure  search-for-primes  that checks the prim
 
 #prob([
 The `smallest-divisor` procedure shown at the start of this section does lots of needless testing: After it checks to see if the number is divisible by 2 there is no point in checking to see if it is divisible by any larger even numbers. This suggests that the values used for `test-divisor` should not be 2, 3, 4, 5, 6, …, but rather 2, 3, 5, 7, 9, …. To implement this change, define a procedure next that returns 3 if its input is equal to 2 and otherwise returns its input plus 2. Modify the `smallest-divisor` procedure to use `(next test-divisor)` instead of `(+ test-divisor 1)`. With `timed-prime-test` incorporating this modified version of `smallest-divisor`, run the test for each of the 12 primes found in Exercise 1.22. Since this modification halves the number of test steps, you should expect it to run about twice as fast. Is this expectation confirmed? If not, what is the observed ratio of the speeds of the two algorithms, and how do you explain the fact that it is different from 2?
+])
+
+#answer([
+```lisp
+#lang racket
+
+(define (smallest-divisor n)
+  (find-divisor n 2))
+
+(define (find-divisor n test-divisor)
+  (cond ((> (* test-divisor test-divisor) n) n)
+        ((divides? test-divisor n) test-divisor)
+        (else (find-divisor n (nextdiv test-divisor)))))
+
+(define (divides? a b)
+  (= (remainder b a) 0))
+
+(define (prime? n)
+  (= n (smallest-divisor n)))
+
+(define (nextdiv test-divisor)
+  (cond ((= test-divisor 2) 3)
+        (else (+ test-divisor 2))))
+
+(define (timed-prime-test n start-time)
+  (cond ((prime? n)
+         (display n)
+         (display "is a prime | found in ")
+         (display (- (current-milliseconds) start-time))
+         (newline)
+         true)
+        (else false)))
+
+(define (primes-larger-than n x)
+  (cond ((= x 0) false)
+        (else (cond ((timed-prime-test n (current-milliseconds)) (primes-larger-than (+ n 1) (- x 1)))
+                    (else (primes-larger-than (+ n 1) x))))))
+
+(primes-larger-than 100000000 3)
+;100000007 is a prime | found in 0
+;100000037 is a prime | found in 0
+;100000039 is a prime | found in 0
+;#f
+
+(primes-larger-than 1000000000 3)
+;1000000007 is a prime | found in 0
+;1000000009 is a prime | found in 0
+;1000000021 is a prime | found in 0
+;#f
+
+(primes-larger-than 10000000000 3)
+;10000000019 is a prime | found in 0
+;10000000033 is a prime | found in 0
+;10000000061 is a prime | found in 0
+;#f
+  ```
+  uhhhhhh yeah same thing :P
+])
+
+#prob([
+  Modify the timed-prime-test procedure of Exercise 1.22 to use fast-prime? (the Fermat method), and test each of the 12 primes you found in that exercise. Since the Fermat test has $Theta(log(n))$ growth, how would you expect the time to test primes near 1,000,000 to compare with the time needed to test primes near 1000? Do your data bear this out? Can you explain any discrepancy you find?
+])
+
+#answer([
 ])
