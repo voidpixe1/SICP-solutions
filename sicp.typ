@@ -871,9 +871,10 @@ The `smallest-divisor` procedure shown at the start of this section does lots of
 
 (define (primes-larger-than n x)
   (cond ((= x 0) false)
-        (else (cond ((timed-prime-test n)
+        (else (cond ((timed-prime-test n (current-milliseconds))
                      (primes-larger-than (+ n 1) (- x 1)))
                     (else (primes-larger-than (+ n 1) x))))))
+
 
 (primes-larger-than 100000000 3)
 ;100000007 is a prime | found in 0
@@ -902,6 +903,16 @@ The `smallest-divisor` procedure shown at the start of this section does lots of
 
 #answer([
   ```lisp
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder
+           (* (expmod base (/ exp 2) m) (expmod base (/ exp 2) m))
+           m))
+        (else
+          (remainder
+            (* base (expmod base (- exp 1) m))
+            m))))
 
 (define (fermat-test n)
   (define (try-it a)
@@ -913,18 +924,82 @@ The `smallest-divisor` procedure shown at the start of this section does lots of
         ((fermat-test n) (fast-prime? n (- times 1)))
         (else false)))
 
-(define (timed-prime-test n)
-  (newline)
-  (display n)
-  (start-prime-test n (runtime)))
+(define (timed-prime-test n start-time)
+  (cond ((fast-prime? n 12)
+         (display n)
+         (display "is a prime | found in ")
+         (display (- (current-milliseconds) start-time))
+         (newline)
+         #t)
+        (else #f)))
 
-(define (start-prime-test n start-time)
-  (if (fast-prime? n)
-      (report-prime (- (runtime) start-time))))
+(define (primes-larger-than n x)
+  (cond ((= x 0) false)
+        (else (cond ((timed-prime-test n (current-milliseconds))
+                     (primes-larger-than (+ n 1) (- x 1)))
+                    (else (primes-larger-than (+ n 1) x))))))
 
-(define (report-prime elapsed-time)
-  (display " *** ")
-  (display elapsed-time))
+(primes-larger-than 100000 3)
+(display "\n\n")
+(primes-larger-than 1000 3)
 
+;1000003is a prime | found in 180
+;1000033is a prime | found in 186
+;1000037is a prime | found in 186
+;#f
+;
+;
+;1009is a prime | found in 0
+;1013is a prime | found in 0
+;1019is a prime | found in 0
+;#f
   ```
+  hory shit, racket is so slow that it actually gave me a time
+])
+
+#prob([
+
+Alyssa P. Hacker complains that we went to a lot of extra work in writing expmod. After all, she says, since we already know how to compute exponentials, we could have simply written
+
+```lisp
+(define (expmod base exp m)
+  (remainder (fast-expt base exp) m))
+```
+
+Is she correct? Would this procedure serve as well for our fast prime tester? Explain.
+])
+
+#answer([
+  no clue about time complexity but this sht will not fly for space for sure, cuz fast-expt makes recursive calls to itself and so does remainder, which means the remainder will be called for EACH call to fast-expt (atleast the way we have defined it till now)
+])
+
+#prob([
+Louis Reasoner is having great difficulty doing Exercise 1.24. His
+`fast-prime?` test seems to run more slowly than his `prime?` test. Louis calls
+his friend Eva Lu Ator over to help. When they examine Louis’s code, they find
+that he has rewritten the expmod procedure to use an explicit multiplication,
+rather than calling square:
+
+```lisp
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder 
+          (* (expmod base (/ exp 2) m)
+             (expmod base (/ exp 2) m))
+          m))
+        (else
+         (remainder 
+          (* base 
+             (expmod base (- exp 1) m))
+          m))))
+```
+
+“I don’t see what difference that could make,” says Louis. “I do.” says Eva.
+“By writing the procedure like that, you have transformed the $Theta(log n)$ 
+ process into a $Theta(n)$
+ process.” Explain.
+])
+
+#answer([
 ])
