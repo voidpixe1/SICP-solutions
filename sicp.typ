@@ -985,8 +985,7 @@ rather than calling square:
   (cond ((= exp 0) 1)
         ((even? exp)
          (remainder 
-          (* (expmod base (/ exp 2) m)
-             (expmod base (/ exp 2) m))
+          (* (expmod base (/ exp 2) m) (expmod base (/ exp 2) m))
           m))
         (else
          (remainder 
@@ -1002,4 +1001,8 @@ rather than calling square:
 ])
 
 #answer([
+  if we use ```lisp (square (expmod base (/ exp 2) m))``` then firstly we would've done then (expmod base (/ exp 2) m) and then $"(square <result> <result>)"$
+  so we would've evaluated (expmod) ONCE every cycle
+
+  but if we do ```lisp(* (expmod base (/ exp 2) m) (expmod base (/ exp 2) m))``` then we need to calculate (expmod) TWICE which means that for every 
 ])
