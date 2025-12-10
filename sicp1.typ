@@ -1,5 +1,5 @@
 #set page(
-  numbering: "--[1]--",
+  numbering: "[1]",
   margin: 3em,
 )
 
@@ -176,9 +176,8 @@
 ])
 
 #prob([
-  Translate the following expression into prefix #image(
-    "images/1-2.png", width: 30%,format: "png",
-  )
+  Translate the following expression into prefix 
+  #image( "images/1-2.png", width: 30%,format: "png" )
 ])
 
 #answer([
@@ -560,7 +559,6 @@ A function $f$ is defined by the rule that $f(n)=n$ if $n<3$ and $f(n)=f(n-1)+2f
            ((= kinds-of-coins 5) 50))) 
   (count-change 11)
   ```
-  //#image("./images/SICP-1-14-tree.png")
   $ sum_(i=a)^b 1/i(i+2) $
 ])
 
@@ -674,8 +672,8 @@ Show that if we apply such a transformation $T_(p q)$ twice, the effect is the s
     ((even? count)
      (fib-iter a
                b
-               <??> ; compute p′
-               <??> ; compute q′
+               ⟨??⟩ ; compute p′
+               ⟨??⟩ ; compute q′
                (/ count 2)))
     (else (fib-iter (+ (* b q) (* a q) (* a p))
                     (+ (* b p) (* a q))
@@ -1026,35 +1024,133 @@ One variant of the Fermat test that cannot be fooled is called the Miller-Rabin 
 ])
 
 #answer([
+  TODO
 ])
 
+#pagebreak()
+
 #notes([
-  this sum program made me question for a bit, but it is simple tbh\
-  this is actually just sigma notation (yeah i know even the book says that, how original)
-```lisp
-(define (sum term a next b)
-  (if (> a b) 0
-      (+ (term a) (sum term (next a) next b))))
-```
-  $ sum_(k=a)^b f(n) = f(a) + ... + f(b) $
+  #grid(
+    columns: (auto, auto),    
+    gutter: 10pt,
+    [
+    ```lisp
+    (define (sum term a next b)
+      (if (> a b) 0
+          (+ (term a) (sum term (next a) next b))))
+    ``` ], [ $ sum_(k=a)^b f(n) = f(a) + ... + f(b) $ ],
+  )
 
-  also one more key point to note was how we can use this for approximating integrals
+  *MIDPOINT THEOREM*
 
-```lisp
-(define (integral f a b dx)
-  (define (add-dx x)
-    (+ x dx))
-  (* (sum f (+ a (/ dx 2.0)) add-dx b) dx))
-```
-  $ integral_(a)^b  = [f(a + (d x)/2) + f(a + (d x) +(d x)/2) + f(a + 2(d x) +(d x)/2) + ... ] $
+  $ integral^b_a f(x) = d x[f(a + (d x)/2) + f(a + d x + (d x)/2) + f(a + 2d x + (d x)/2)] $
+  #figure([ #image("./images/midpointgraph.webp", width: 80%) ])
+
+  *TRAPEZOIDAL THEOREM*
+
+  $ integral^b_z f(x) = (d x)/2[f(a) + 2(f(a + d x) + f(a + 2d x) + f(a + 3d x) + f(a + 4d x) ... ) f(b)] $
+  #figure([ #image("./images/trapezoid.webp", width: 80%) ])
 ])
 
 #prob([
 Simpson’s Rule is a more accurate method of numerical integration than the method illustrated above. Using Simpson’s Rule, the integral of a function $f$ between $a$ and $b$ is approximated as:
+
   $ (h/3)(y_0 + 4y_1 + 2y_2 + 4y_3 + 2y_4 + · · · + 2y_(n−2) + 4y_(n−1) + y_n) $
 
 where $h = (b −a)/n$, for some even integer $n$, and $y_k = f (a + k h).$ (Increasing n increases the accuracy of the approximation.) Define a procedure that takes as arguments f , a, b, and n and returns the value of the integral, computed using Simpson’s Rule. Use your procedure to integrate cube between 0 and 1 (with $n = 100$ and $n = 1000$), and compare the results to those of the integral procedure shown above.
 ])
 
 #answer([
+  ```lisp
+(define (integral f a b n)
+
+  (define (sum term a next b)
+    (if (> a b)
+        0
+        (+ (term a)
+           (sum term (next a) next b))))
+
+  (define (h) (/ (- b a) n))
+
+  (define (y k)
+    (f (+ a (* k (h)))))
+
+  (define (element k)
+    (cond ((= k 0) (* 1 (y k)))
+          ((= k n) (* 1 (y k)))
+          ((odd? k) (* 4 (y k)))
+          (else (* 2 (y k)))))
+
+  (define (sus n)
+    (+ n 1))
+
+  (* (/ (h) 3) (sum element 0 sus n)))
+
+(define (square x)
+  (* x x))
+
+(integral square 0 1 100.00)
+;0.33333333333333337
+(integral square 0 1 1000.00)
+;0.33333333333333326
+  ```
+  HOLY SHIT THIS TOOK ME A WHOLE DAY TO DO, i have no idea about calc 1 i guess ;-; also just discovered that you need double decimal digits after the number to get accurate decimal places :P }:3
+])
+
+#prob([
+e sum procedure above generates a linear recursion. e procedure can be rewrien so that the sum is performed iteratively. Show how to do this by filling in the missing expressions in the following definition:
+  ```lisp
+  (define (sum term a next b)
+    (define (iter a result)
+      (if ⟨??⟩
+          ⟨??⟩
+          (iter ⟨??⟩⟨??⟩)))
+    (iter ⟨??⟩⟨??⟩))
+  ```
+])
+
+#answer([
+```lisp
+(define (sum term a next b)
+  (define (iter a result)
+    (if (> a b)
+        result
+        (iter (next a) (+ result (term a)))))
+  (iter a 0))
+```
+])
+
+#prob([
+  - e sum procedure is only the simplest of a vast number of similar abstractions that can be captured as higher-order procedures. Write an analogous procedure called product that returns the product of the values of a function at points over a given range. Show how to define factorial in terms of product. Also use product to compute approximations to π using the formula.
+  $ pi/4 = (2.4.4.6.6.8...)/(3.3.5.5.7.7...) $
+  - If your product procedure generates a recursive process, write one that generates an iterative process. If it generates an iterative process, write one that generates a recursive process.
+])
+
+#answer([
+- ```lisp
+(define (products func a next b)
+  (if (> a b) 1
+      (* (func a) (products func (next a) next b))))
+
+(define (factorial n)
+  (define (next-term n)
+    (+ n 1))
+  (define (element k)
+    k)
+  (products element 1 next-term n))
+
+(factorial 3)
+```
+
+- ```lisp
+(define (products-iter func a next b)
+  (define (helperiter a result)
+    (if (> a b) result
+        (helperiter (next a) (* result (func a)))))
+  (helperiter a 1))
+  ```
+])
+
+#prob([
+
 ])
