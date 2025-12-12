@@ -365,7 +365,7 @@ square-root procedure.
 #prob([
 Each of the following two
 procedures defines a method for adding two positive integers in terms of the
-procedures `inc`, which increments its argument by 1, and `dec`,
+procedures inc, which increments its argument by 1, and dec,
 which decrements its argument by 1.
 
 ```lisp
@@ -833,7 +833,7 @@ Using this procedure, write a procedure  search-for-primes  that checks the prim
 ])
 
 #prob([
-The `smallest-divisor` procedure shown at the start of this section does lots of needless testing: After it checks to see if the number is divisible by 2 there is no point in checking to see if it is divisible by any larger even numbers. This suggests that the values used for `test-divisor` should not be 2, 3, 4, 5, 6, …, but rather 2, 3, 5, 7, 9, …. To implement this change, define a procedure next that returns 3 if its input is equal to 2 and otherwise returns its input plus 2. Modify the `smallest-divisor` procedure to use `(next test-divisor)` instead of `(+ test-divisor 1)`. With `timed-prime-test` incorporating this modified version of `smallest-divisor`, run the test for each of the 12 primes found in Exercise 1.22. Since this modification halves the number of test steps, you should expect it to run about twice as fast. Is this expectation confirmed? If not, what is the observed ratio of the speeds of the two algorithms, and how do you explain the fact that it is different from 2?
+The smallest-divisor procedure shown at the start of this section does lots of needless testing: After it checks to see if the number is divisible by 2 there is no point in checking to see if it is divisible by any larger even numbers. This suggests that the values used for test-divisor should not be 2, 3, 4, 5, 6, …, but rather 2, 3, 5, 7, 9, …. To implement this change, define a procedure next that returns 3 if its input is equal to 2 and otherwise returns its input plus 2. Modify the smallest-divisor procedure to use `(next test-divisor)` instead of `(+ test-divisor 1)`. With timed-prime-test incorporating this modified version of smallest-divisor, run the test for each of the 12 primes found in Exercise 1.22. Since this modification halves the number of test steps, you should expect it to run about twice as fast. Is this expectation confirmed? If not, what is the observed ratio of the speeds of the two algorithms, and how do you explain the fact that it is different from 2?
 ])
 
 #answer([
@@ -972,7 +972,7 @@ Is she correct? Would this procedure serve as well for our fast prime tester? Ex
 
 #prob([
 Louis Reasoner is having great difficulty doing Exercise 1.24. His
-`fast-prime?` test seems to run more slowly than his `prime?` test. Louis calls
+fast-prime? test seems to run more slowly than his `prime?` test. Louis calls
 his friend Eva Lu Ator over to help. When they examine Louis’s code, they find
 that he has rewritten the expmod procedure to use an explicit multiplication,
 rather than calling square:
@@ -1020,7 +1020,7 @@ rather than calling square:
 ])
 
 #prob([
-One variant of the Fermat test that cannot be fooled is called the Miller-Rabin test (Miller 1976; Rabin 1980). This starts from an alternate form of Fermat’s Little Theorem, which states that if $n$ is a prime number and $a$ is any positive integer less than $n,$ then $a^(n-1) equiv 1(mod)n.$ To test the primality of a number $n$ by the Miller-Rabin test, we pick a random number $a\lt n$ and find $a^(n-1)(mod)n $ using the `expmod` procedure. However, whenever we perform the squaring step in `expmod`, we check to see if we have discovered a “nontrivial square root of 1 modulo $n$ ,” that is, a number not equal to 1 or $n−1$ whose square is equal to 1 modulo $n.$ It is possible to prove that if such a nontrivial square root of 1 exists, then $n$ is not prime. It is also possible to prove that if $n$ is an odd number that is not prime, then, for at least half the numbers $a < n$ , computing $a^(n-1)$ in this way will reveal a nontrivial square root of 1 modulo $n.$ (This is why the Miller-Rabin test cannot be fooled.) Modify the expmod procedure to signal if it discovers a nontrivial square root of 1, and use this to implement the Miller-Rabin test with a procedure analogous to `fermat-test`. Check your procedure by testing various known primes and non-primes. Hint: One convenient way to make `expmod` signal is to have it return 0.
+One variant of the Fermat test that cannot be fooled is called the Miller-Rabin test (Miller 1976; Rabin 1980). This starts from an alternate form of Fermat’s Little Theorem, which states that if $n$ is a prime number and $a$ is any positive integer less than $n,$ then $a^(n-1) equiv 1(mod)n.$ To test the primality of a number $n$ by the Miller-Rabin test, we pick a random number $a\lt n$ and find $a^(n-1)(mod)n $ using the expmod procedure. However, whenever we perform the squaring step in expmod, we check to see if we have discovered a “nontrivial square root of 1 modulo $n$ ,” that is, a number not equal to 1 or $n−1$ whose square is equal to 1 modulo $n.$ It is possible to prove that if such a nontrivial square root of 1 exists, then $n$ is not prime. It is also possible to prove that if $n$ is an odd number that is not prime, then, for at least half the numbers $a < n$ , computing $a^(n-1)$ in this way will reveal a nontrivial square root of 1 modulo $n.$ (This is why the Miller-Rabin test cannot be fooled.) Modify the expmod procedure to signal if it discovers a nontrivial square root of 1, and use this to implement the Miller-Rabin test with a procedure analogous to fermat-test. Check your procedure by testing various known primes and non-primes. Hint: One convenient way to make expmod signal is to have it return 0.
 ])
 
 #answer([
@@ -1133,24 +1133,87 @@ where $h = (b −a)/n$, for some even integer $n$, and $y_k = f (a + k h).$ (Inc
       (* (func a) (products func (next a) next b))))
 
 (define (factorial n)
-  (define (next-term n)
-    (+ n 1))
-  (define (element k)
-    k)
-  (products element 1 next-term n))
+  (define (next n) (+ n 1))
+  (define (element k) k)
+  (products element 1 next n))
 
 (factorial 3)
 ```
 
 - ```lisp
 (define (products-iter func a next b)
-  (define (helperiter a result)
-    (if (> a b) result
-        (helperiter (next a) (* result (func a)))))
+  (define (helperiter counter result) ;named the 'a' variable to 'counter' because in the original sum-iter it was causing me problems to keep track (but DrRacket formats it very nicely :P)
+    (if (> counter b) result
+        (helperiter (next counter) (* result (func counter)))))
   (helperiter a 1))
   ```
 ])
 
 #prob([
+  *1.* Show that sum and product (Exercise 1.31) are both special
+  cases of a still more general notion called accumulate that combines a
+  collection of terms, using some general accumulation function:
 
+  ```lisp
+  (accumulate combiner null-value term a next b)
+  ```
+
+  Accumulate takes as arguments the same term and range specifications as
+  sum and product, together with a combiner procedure (of
+  two arguments) that specifies how the current term is to be combined with the
+  accumulation of the preceding terms and a null-value that specifies what
+  base value to use when the terms run out.  Write accumulate and show how
+  sum and product can both be defined as simple calls to
+  accumulate.
+
+  *2.* If your accumulate procedure generates a recursive process, write one
+  that generates an iterative process.  If it generates an iterative process,
+  write one that generates a recursive process.
+])
+
+#answer([
+  *1*
+  ```lisp
+(define (accumulate combiner null-value term a next b)
+  (cond ((> a b) null-value)
+        (else (combiner (term a)
+                        (accumulate combiner null-value term (next a) next b)))))
+  ```
+
+  *2*
+  ```lisp
+(define (accumulate-iter combiner null-value term a next b)
+  (define (helperiter counter result)
+    (if (> counter b)
+        result
+        (helperiter (next counter) (combiner result (term counter)))))
+  (helperiter a null-value))
+  ```
+  for the definitions of sum and product
+  ```lisp
+(define (sum term a next b)
+  (accumulate + 0 term a next b))
+
+(define (product term a next b)
+  (accumulate * 1 term a next b))
+  ```
+])
+
+#prob([
+You can obtain an even more
+general version of accumulate (Exercise 1.32) by introducing the
+notion of a filter on the terms to be combined.  That is, combine
+only those terms derived from values in the range that satisfy a specified
+condition.  The resulting filtered-accumulate abstraction takes the same
+arguments as accumulate, together with an additional predicate of one argument
+that specifies the filter.  Write filtered-accumulate as a procedure.
+Show how to express the following using filtered-accumulate:
+
+1. the sum of the squares of the prime numbers in the interval $a$ to $b$ (assuming that you have a prime? predicate already written)
+
+2. the product of all the positive integers less than $n$ that are relatively prime to $n$ (i.e., all positive integers $i < n$ such that $"GCD"(i, n) = 1$).
+])
+
+#answer([
+  i don't even understand wtf this question is asking me to do tbh ;-;
 ])
