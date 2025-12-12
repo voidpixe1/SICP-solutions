@@ -1094,7 +1094,7 @@ where $h = (b −a)/n$, for some even integer $n$, and $y_k = f (a + k h).$ (Inc
 (integral square 0 1 1000.00)
 ;0.33333333333333326
   ```
-  HOLY SHIT THIS TOOK ME A WHOLE DAY TO DO, i have no idea about calc 1 i guess ;-; also just discovered that you need double decimal digits after the number to get accurate decimal places :P }:3
+  HOLY SHIT THIS TOOK ME A WHOLE DAY TO DO, i have no idea about calc 1 i guess ;-; also just discovered that you need double decimal digits after the number to get accurate decimal places :P
 ])
 
 #prob([
@@ -1121,7 +1121,7 @@ where $h = (b −a)/n$, for some even integer $n$, and $y_k = f (a + k h).$ (Inc
 ])
 
 #prob([
-  - e sum procedure is only the simplest of a vast number of similar abstractions that can be captured as higher-order procedures. Write an analogous procedure called product that returns the product of the values of a function at points over a given range. Show how to define factorial in terms of product. Also use product to compute approximations to π using the formula.
+  - e sum procedure is only the simplest of a vast number of similar abstractions that can be captured as higher-order procedures. Write an analogous procedure called product that returns the product of the values of a function at points over a given range. Show how to define factorial in terms of product. Also use product to compute approximations to $pi$ using the formula.
   $ pi/4 = (2.4.4.6.6.8...)/(3.3.5.5.7.7...) $
   - If your product procedure generates a recursive process, write one that generates an iterative process. If it generates an iterative process, write one that generates a recursive process.
 ])
@@ -1132,17 +1132,42 @@ where $h = (b −a)/n$, for some even integer $n$, and $y_k = f (a + k h).$ (Inc
   (if (> a b) 1
       (* (func a) (products func (next a) next b))))
 
+; defining factorial
 (define (factorial n)
   (define (next n) (+ n 1))
   (define (element k) k)
   (products element 1 next n))
 
 (factorial 3)
+
 ```
+  i am simplifying to find pi
+  $ pi/4 = (2.4.4.6.6.8...)/(3.3.5.5.7.7...)\
+    pi/2 = (2.2.4.4.6.6.8...)/(3.3.5.5.7.7...)\
+    pi/2 = (2^(2).4^(2).6^(2).8^(2)...)/(3^(2).5^(2).7^(2)...)\ $ 
+  ```lisp
+(define (next-term x) (+ x 2))
+
+(define (element x) (* x x))
+
+(define (pie precision)
+  (* 2 (/ (product element 2 next-term precision)
+          (product element 3 next-term (- precision 1)))))
+
+(pie 100)
+; 315
+(pie 1000)
+; 3143
+(pie 10000)
+; 31417
+(pie 100000)
+; 314160
+; pretty good i guess?
+  ```
 
 - ```lisp
 (define (products-iter func a next b)
-  (define (helperiter counter result) ;named the 'a' variable to 'counter' because in the original sum-iter it was causing me problems to keep track (but DrRacket formats it very nicely :P)
+  (define (helperiter counter result)
     (if (> counter b) result
         (helperiter (next counter) (* result (func counter)))))
   (helperiter a 1))
@@ -1172,16 +1197,14 @@ where $h = (b −a)/n$, for some even integer $n$, and $y_k = f (a + k h).$ (Inc
 ])
 
 #answer([
-  *1*
-  ```lisp
+  1. ```lisp
 (define (accumulate combiner null-value term a next b)
   (cond ((> a b) null-value)
         (else (combiner (term a)
                         (accumulate combiner null-value term (next a) next b)))))
   ```
 
-  *2*
-  ```lisp
+  2. ```lisp
 (define (accumulate-iter combiner null-value term a next b)
   (define (helperiter counter result)
     (if (> counter b)
@@ -1216,4 +1239,9 @@ Show how to express the following using filtered-accumulate:
 
 #answer([
   i don't even understand wtf this question is asking me to do tbh ;-;
+  what is a filter :'D
+])
+
+#prob([
+ 
 ])
