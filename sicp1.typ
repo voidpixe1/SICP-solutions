@@ -1244,4 +1244,93 @@ Show how to express the following using filtered-accumulate:
 
 #prob([
  
+Suppose we define the procedure
+```lisp
+(define (f g) (g 2))
+```
+Then we have
+```lisp
+(f square)
+4
+```
+```lisp
+(f (lambda (z) (* z (+ z 1))))
+6
+```
+What happens if we (perversely) ask the interpreter to evaluate the combination
+(f f)?  Explain.
 ])
+
+#answer([
+  ```txt
+application: not a procedure;
+ expected a procedure that can be applied to arguments
+  given: 2
+  context...:
+  ```
+  this results in syntax error because
+  ```lisp
+  (f f)
+  (f 2)
+  (2 2) ; <----this is wrong syntax
+  ```
+])
+
+#prob([
+  Show that the golden ratio
+  $phi$ (Section 1.2.2) is a fixed point of the transformation 
+  $x mapsto 1 + 1 / x$ and use this fact to compute $phi$ by means 
+  of the `fixed-point` procedure.
+])
+
+#answer([
+  wishfully thinking that $phi$ IS really the fixed point of $x mapsto 1 + 1 / x$
+  then:
+
+  $
+  1+1/x = x\
+  x+1=x^2\
+  x^2-x-1=0\
+  x=(1 plus.minus (sqrt(5)))/2
+  $
+
+  then
+  ```lisp
+  (display "value of phi")
+  (/ (+ 1.0 (sqrt 5.0)) 2.0)
+
+(define tolerance 0.00001)
+
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2))
+       tolerance))
+  (define (try guess)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
+
+(define (phicalc x)
+  (+ 1.00 (/ 1.00 x)))
+
+(display "value of phi using phicalc")
+(fixed-point phicalc 1.5)
+; value of phi: 1.618033988749895
+; value of phi using phicalc: 1.6180327868852458
+  ```
+])
+
+#prob([
+  Modify `fixed-point` so that
+  it prints the sequence of approximations it generates, using the `newline`
+  and `display` primitives shown in Exercise 1.22.  Then find a
+  solution to $x^x = 1000$ by finding a fixed point of $x mapsto
+  log(1000) / log(x)$.  (Use Scheme's primitive `log`
+  procedure, which computes natural logarithms.)  Compare the number of steps
+  this takes with and without average damping.  (Note that you cannot start
+  `fixed-point` with a guess of 1, as this would cause division by
+  $log(1) = 0$.)
+])
+
