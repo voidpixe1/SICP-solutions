@@ -1464,15 +1464,85 @@ $ frac(
   ```lisp
 ; initial was iterative
 (define (cont-frac n d k)
-  (define (helperiter acc i)
-    (if (= i 0)
+  (define (helperiter acc x)
+    (if (= x 0)
         acc
-        (helperiter (/ (n i) (+ (d i) acc)) (- i 1))))
+        (helperiter (/ (n x) (+ (d x) acc)) (- x 1))))
   (helperiter 0 k))
 
-(cont-frac (lambda (i) 1.0) (lambda (i) 1.0) 100)
+(cont-frac (lambda (x) 1.0) (lambda (x) 1.0) 100)
 (/ 1.00 (/ (+ 1.00 (sqrt 5.00)) 2.00))
 
 ; now for recursive it is shrimple 
   ```
+])
+
+#prob([
+  In 1737, the Swiss mathematician
+  Leonhard Euler published a memoir De Fractionibus Continuis, which
+  included a continued fraction expansion for $e - 2$, where $e$ is the base
+  of the natural logarithms.  In this fraction, the $N_i$ are all 1, and
+  the $D_i$ are successively:
+
+  `1, 2, 1, 1, 4, 1, 1, 6, 1, 1, 8, ...`
+
+  Write a program that uses your `cont-frac` procedure from Exercise 1.37 
+  to approximate $e$, based on Euler's expansion.
+])
+
+#answer([
+```lisp
+(define (den k)
+  (if (= (remainder k 3) 2)
+      (+ 2.00 (* 2.00 (quotient k 3)))
+      1.00))
+
+(define (num k) 1)
+
+(define (approx-e k)
+  (+ 2.00 (cont-frac num den k)))
+
+(approx-e 10)
+;2.7182817182817183
+(approx-e 100)
+;2.7182818284590455
+  ```
+  first try B) [me when the modular arithmetic]
+])
+
+#prob([
+  A continued fraction representation of the tangent function was published in 1770 by the German mathematician J.H. Lambert: 
+  $ tan x = frac(x, 1 - frac(x^2, 3 - frac(x^2, 5 - dots.c))) $
+  where $x$ is in radians.  Define a procedure `(tan-cf x k)` that computes an approximation to the tangent function based on Lambert's formula. `k` specifies the number of terms to compute, as in Exercise 1.37.
+])
+
+#answer([
+  ```lisp
+(define (tan-sus x k)
+  (define (den n)
+    (- (* n 2) 1))
+  (define (num n)
+    (if (= n 1) x
+        (* -1 x x)))
+  (cont-frac num den k))
+
+(tan 3.14)
+-0.000592653659180776
+(tan-sus 3.14 10)
+-0.0005926555452557651
+  ```
+  huh...........pretty good....i guess? idk?
+])
+
+#prob([
+Define a procedure `cubic`
+that can be used together with the `newtons-method` procedure in
+expressions of the form
+```lisp
+(newtons-method (cubic a b c) 1)
+```
+to approximate zeros of the cubic $x^3 + a x^2 + b x + c$.
+])
+
+#answer([
 ])
