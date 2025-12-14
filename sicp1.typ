@@ -8,6 +8,8 @@
   size: 13pt,
 )
 
+#show math.equation.where(block: false): set math.frac(style: "horizontal")
+
 #let counter = counter("problem")
 
 
@@ -1326,11 +1328,151 @@ application: not a procedure;
   Modify `fixed-point` so that
   it prints the sequence of approximations it generates, using the `newline`
   and `display` primitives shown in Exercise 1.22.  Then find a
-  solution to $x^x = 1000$ by finding a fixed point of $x mapsto
-  log(1000) / log(x)$.  (Use Scheme's primitive `log`
-  procedure, which computes natural logarithms.)  Compare the number of steps
-  this takes with and without average damping.  (Note that you cannot start
-  `fixed-point` with a guess of 1, as this would cause division by
-  $log(1) = 0$.)
+  solution to $x^x = 1000$ by finding a fixed point of $x mapsto log(1000) / log(x)$.
+  (Use Scheme's primitive `log` procedure, which computes natural logarithms.)
+  Compare the number of steps this takes with and without average damping.
+  (Note that you cannot start `fixed-point` with a guess of 1,
+  as this would cause division by $log(1) = 0$.)
 ])
 
+#answer([
+  ```lisp
+(define tolerance 0.00001)
+
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2))
+       tolerance))
+  (define (try guess)
+    (let ((next (f guess)))
+      (display "try: ") (display next) (newline)
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
+
+(define (func x)
+  (/ (log 1000) (log x)))
+
+(define (damp x)
+  (/ (+ (func x) x) 2))
+
+(fixed-point (lambda (x) (damp (func x))) 2)
+; $ racket test.rkt
+; try: 6.485128247251651
+; try: 4.490141163115099
+; try: 4.563162341921608
+; try: 4.5546831412819255
+; try: 4.555631480818134
+; try: 4.555524951832057
+; try: 4.555536912620918
+; try: 4.555535569622013
+; 4.555535569622013
+; $ racket test.rkt | wc -l
+; 9
+  ```
+
+  ```lisp
+(define tolerance 0.00001)
+
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2))
+       tolerance))
+  (define (try guess)
+    (let ((next (f guess)))
+      (display "try: ") (display next) (newline)
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
+
+(define (func x)
+  (/ (log 1000) (log x)))
+
+(define (damp x)
+  (/ (+ (func x) x) 2))
+
+(fixed-point func 2)
+
+; $ racket test.rkt                   
+; try: 9.965784284662087
+; try: 3.004472209841214
+; try: 6.279195757507157
+; try: 3.759850702401539
+; try: 5.215843784925895
+; try: 4.182207192401397
+; try: 4.8277650983445906
+; try: 4.387593384662677
+; try: 4.671250085763899
+; try: 4.481403616895052
+; try: 4.6053657460929
+; try: 4.5230849678718865
+; try: 4.577114682047341
+; try: 4.541382480151454
+; try: 4.564903245230833
+; try: 4.549372679303342
+; try: 4.559606491913287
+; try: 4.552853875788271
+; try: 4.557305529748263
+; try: 4.554369064436181
+; try: 4.556305311532999
+; try: 4.555028263573554
+; try: 4.555870396702851
+; try: 4.555315001192079
+; try: 4.5556812635433275
+; try: 4.555439715736846
+; try: 4.555599009998291
+; try: 4.555493957531389
+; try: 4.555563237292884
+; try: 4.555517548417651
+; try: 4.555547679306398
+; try: 4.555527808516254
+; try: 4.555540912917957
+; try: 4.555532270803653
+; 4.555532270803653
+;
+; $ racket test.rkt | wc -l
+; 35
+  ```
+  it takes $ 35 - 9 $ more steps without avg damping
+])
+
+#prob([
+
+  *1.* An infinite continued fraction is an expression of the form 
+  $ N_1 / (D_1 + N_2 / (D_2 + N_3 / (D_3 + dots.h))) $
+  As an example, one can show that the infinite continued fraction expansion with the $N_i$ and the $D_i$ all equal to 1 produces $1 / phi$, where $phi$ is the golden ratio (described in 1.2.2).  One way to approximate an infinite continued fraction is to truncate the expansion after a given number of terms.  Such a truncation--a so-called k-term finite continued fraction--has the form 
+$ frac(
+  N_1,
+  D_1 + frac(
+    N_2,
+    dots.h + frac(N_k, D_k)
+  )
+) $
+  Suppose that `n` and `d` are procedures of one argument (the term index $i$) that return the $N_i$ and $D_i$ of the terms of the continued fraction.  Define a procedure `cont-frac` such that evaluating `(cont-frac n d k)` computes the value of the $k$-term finite continued fraction.  Check your procedure by approximating $1 / phi$ using 
+  ```lisp 
+  (cont-frac (lambda (i) 1.0) (lambda (i) 1.0) k)
+  ```
+  for successive values of `k`.  How large must you make `k` in order to get an approximation that is accurate to 4 decimal places?
+
+  *2.* If your `cont-frac` procedure generates a recursive process, write one that generates an iterative process.  If it generates an iterative process, write one that generates a recursive process.
+])
+
+#answer([
+
+  ```lisp
+; initial was iterative
+(define (cont-frac n d k)
+  (define (helperiter acc i)
+    (if (= i 0)
+        acc
+        (helperiter (/ (n i) (+ (d i) acc)) (- i 1))))
+  (helperiter 0 k))
+
+(cont-frac (lambda (i) 1.0) (lambda (i) 1.0) 100)
+(/ 1.00 (/ (+ 1.00 (sqrt 5.00)) 2.00))
+
+; now for recursive it is shrimple 
+  ```
+])
