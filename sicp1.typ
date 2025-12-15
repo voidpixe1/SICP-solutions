@@ -349,7 +349,7 @@ square-root procedure.
 
 ; Fractional good-enough like in ex 1-7
 (define (good-enough? guessL guessLL) 
-  (< (/ (abs (- guessL guessLL)) guessL) 0.01))
+  (< (/ (abs (- guessL guessLL)) guessL) 0.001))
 
 (define (curt-iter guessL guessLL x)
   (if (good-enough? guessL guessLL)
@@ -1507,7 +1507,7 @@ $ frac(
 (approx-e 100)
 ;2.7182818284590455
   ```
-  first try B) [me when the modular arithmetic]
+  first try 😎 [me when the modular arithmetic]
 ])
 
 #prob([
@@ -1545,4 +1545,165 @@ to approximate zeros of the cubic $x^3 + a x^2 + b x + c$.
 ])
 
 #answer([
+```lisp
+(define (abs x)
+  (cond ((> x 0) x)
+        ((< x 0) (* -1 x))
+        (else 0)))
+
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2))
+       tolerance))
+  (define (try guess)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
+
+(define (newton-transform g)
+  (lambda (x) (- x (/ (g x) ((deriv g) x)))))
+
+(define (deriv g)
+  (define dx 0.001)
+  (lambda (x) (/ (- (g (+ x dx)) (g x)) dx)))
+
+(define (newtons-method g guess)
+  (fixed-point (newton-transform g) guess))
+
+(define (cubic a b c)
+  (lambda (x) (+ (* x x x) (* a (* x x)) (* b x) c)))
+
+(newtons-method (cubic -3 1 1) 1)
+; 1
+```
+])
+
+#prob([
+  Define a procedure `double`
+  that takes a procedure of one argument as argument and returns a procedure that
+  applies the original procedure twice.  For example, if `inc` is a
+  procedure that adds 1 to its argument, then `(double inc)` should be a
+  procedure that adds 2.  What value is returned by
+
+  ```lisp
+  (((double (double double)) inc) 5)
+  ```
+])
+
+#answer([
+  `first try 😎 hehehe`
+```lisp
+(define (inc x)
+  (+ 1 x))
+
+(define (dooble x)
+  (lambda (s) (x (x s))))
+
+((dooble inc) 9)
+```
+  for `(((dooble (dooble dooble)) inc) 5)`
+```lisp
+(dooble dooble)
+; (lambda (s) (dooble (dooble s)))
+(dooble (dooble dooble))
+; (lambda (y) ((lambda (s) (dooble (dooble s))) ((lambda (s) (dooble (dooble s))) y)))
+; (lambda (y) ((lambda (s) (dooble (dooble s))) (dooble (dooble y))))
+; (lambda (y) (dooble (dooble (dooble (dooble y)))))
+((dooble (dooble dooble)) inc)
+; (lambda (y) (dooble (dooble (dooble (dooble y)))) inc)
+; (dooble (dooble (dooble (dooble inc))))
+; ^(2*)   ^(2*)   ^(2*)   ^(2*inc)
+; (2*2*2*2*inc)
+; (16*inc)
+; (+ 16)
+(((dooble (dooble dooble)) inc) 5)
+; (+ 16 5)
+```
+])
+
+#prob([
+  Let $f$ and $g$ be two
+  one-argument functions.  The composition $f$ after $g$ is defined
+  to be the function $x mapsto f(g(x))$.  Define a procedure
+  `compose` that implements composition.  For example, if `inc` is a
+  procedure that adds 1 to its argument,
+
+  ```lisp
+  ((compose square inc) 6)
+  49
+  ```
+])
+
+#answer([
+  shrimple 🦐
+  ```lisp
+(define (compose a b)
+  (lambda (s) (a (b s))))
+
+((compose square inc) 5)
+; 36
+  ```
+])
+
+#prob([
+  If $f$ is a numerical function
+  and $n$ is a positive integer, then we can form the $n^"th"$ repeated
+  application of $f$, which is defined to be the function whose value at $x$
+  is $f(f(dots (f(x)) dots ))$.  For example, if $f$ is the
+  function $x mapsto x + 1$, then the $n^"th"$ repeated application of $f$ is
+  the function $x mapsto x + n$.  If $f$ is the operation of squaring a
+  number, then the $n^"th"$ repeated application of $f$ is the function that
+  raises its argument to the $2^n"-th"$ power.  Write a procedure that takes as
+  inputs a procedure that computes $f$ and a positive integer $n$ and returns
+  the procedure that computes the $n^"th"$ repeated application of $f$.  Your
+  procedure should be able to be used as follows:
+
+  ```lisp
+  ((repeated square 2) 5)
+  625
+  ```
+
+  Hint: You may find it convenient to use `compose` from Exercise 1.42.
+])
+
+#answer([
+  ```lisp
+(define (repeated f n)
+  (cond ((= n 1) f)
+        (else (compose (repeated f (- n 1)) f))))
+
+((repeated square 2) 5)
+; 625
+  ```
+])
+
+#prob([
+  The idea of smoothing a
+  function is an important concept in signal processing.  If $f$ is a function
+  and $"dx"$ is some small number, then the smoothed version of $f$ is the
+  function whose value at a point $x$ is the average of $f(x - "dx")$, 
+  $f(x)$, and $f(x + "dx")$.  Write a procedure
+  `smooth` that takes as input a procedure that computes $f$ and returns a
+  procedure that computes the smoothed $f$.  It is sometimes valuable to
+  repeatedly smooth a function (that is, smooth the smoothed function, and so on)
+  to obtain the n-fold smoothed function.  Show how to generate
+  the n-fold smoothed function of any given function using `smooth` and
+  `repeated` from Exercise 1.43.
+])
+
+#answer([
+```lisp
+(define dx 0.0001)
+(define (smooth f)
+  (lambda (x) (/ (+ (f (+ x dx))
+                    (f x)
+                    (f (- x dx)))
+                 3)))
+((smooth square) 2)
+; 4.000000006666666
+(((repeated smooth 5) square) 2)
+; 4.000000033333335
+```
 ])
