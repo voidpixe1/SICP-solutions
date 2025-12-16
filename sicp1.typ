@@ -1707,3 +1707,85 @@ to approximate zeros of the cubic $x^3 + a x^2 + b x + c$.
 ; 4.000000033333335
 ```
 ])
+
+#prob([
+  We saw in 1.3.3
+  that attempting to compute square roots by naively finding a fixed point of
+  $y mapsto x / y$ does not converge, and that this can be fixed by average
+  damping.  The same method works for finding cube roots as fixed points of the
+  average-damped $y mapsto x / y^2$.  Unfortunately, the process does not
+  work for fourth roots---a single average damp is not enough to make a
+  fixed-point search for $y mapsto x / y^3$ converge.  On the other hand, if
+  we average damp twice (i.e., use the average damp of the average damp of 
+  $y mapsto x / y^3$) the fixed-point search does converge.  Do some experiments
+  to determine how many average damps are required to compute $n^"th"$ roots as a
+  fixed-point search based upon repeated average damping of 
+  $y mapsto x / y^{n-1}.$  
+  Use this to implement a simple procedure for computing
+  $n^"th"$ roots using `fixed-point`, `average-damp`, and the
+  `repeated` procedure of Exercise 1.43.  Assume that any arithmetic
+  operations you need are available as primitives.
+])
+
+#answer([
+i don't even understand wtf i need to do
+  TODO
+])
+
+#prob([
+Several of the numerical methods
+described in this chapter are instances of an extremely general computational
+strategy known as iterative improvement.  Iterative improvement says
+that, to compute something, we start with an initial guess for the answer, test
+if the guess is good enough, and otherwise improve the guess and continue the
+process using the improved guess as the new guess.  Write a procedure
+`iterative-improve` that takes two procedures as arguments: a method for
+telling whether a guess is good enough and a method for improving a guess.
+`Iterative-improve` should return as its value a procedure that takes a
+guess as argument and keeps improving the guess until it is good enough.
+Rewrite the `sqrt` procedure of 1.1.7 and the
+`fixed-point` procedure of 1.3.3 in terms of
+`iterative-improve`.
+])
+
+#answer([
+  ```lisp
+(define (iter-improve good-enough? improve)
+  (define (iterating x)
+    (if (good-enough? x)
+        x
+        (iterating (improve x))))
+  iterating)
+  ```
+
+  ```lisp
+(define (average x y)
+  (/ (+ x y) 2))
+
+(define (square x)
+  (* x x))
+
+(define (squareroot x)
+
+  (define (improving y)
+    (average y (/ x y)))
+
+  (define (good? s)
+    (< (abs (- (square s) x)) 0.01))
+
+  ((iter-improve good? improving) x))
+
+(squareroot 2.00)
+; 1.4166666666666665
+  ```
+
+  ```lisp
+(define (fixed-point f guess)
+  (define (close? s)
+    (< (abs (- (f s) s)) 0.01))
+  ((iter-improve close? f) guess))
+
+(fixed-point sin 1.0)
+  ```
+  btw remember that the fixed point of a function is just the point at which $f(x) = x$ or $"the point at which" y=x "intersects" y=f(x)$
+])
