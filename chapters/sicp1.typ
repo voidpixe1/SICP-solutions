@@ -1,17 +1,4 @@
-#set page(
-  numbering: "[1]",
-  margin: 3em,
-)
-
-#set text(
-  font: "Libertinus Serif",
-  size: 13pt,
-)
-
-#show math.equation.where(block: false): set math.frac(style: "horizontal")
-
 #let counter = counter("problem")
-
 
 #show heading.where(level: 1): subprob => {
   counter.update(1)
@@ -45,6 +32,15 @@
     fill: luma(240),
     body
   )
+}
+
+#show heading.where(level: 1): it => {
+  page()[
+    #align(center + horizon)[
+      #set text(size: 26pt, weight: "bold")
+      #it.body
+    ]
+  ]
 }
 
 = SECTION 1
@@ -179,7 +175,7 @@
 
 #prob([
   Translate the following expression into prefix 
-  #image( "images/1-2.png", width: 30%,format: "png" )
+  #image( "../images/1-2.png", width: 30%,format: "png" )
 ])
 
 #answer([
@@ -1046,12 +1042,12 @@ One variant of the Fermat test that cannot be fooled is called the Miller-Rabin 
   *MIDPOINT THEOREM*
 
   $ integral^b_a f(x) = d x[f(a + (d x)/2) + f(a + d x + (d x)/2) + f(a + 2d x + (d x)/2)] $
-  #figure([ #image("./images/midpointgraph.webp", width: 80%) ])
+  #figure([ #image("../images/midpointgraph.webp", width: 80%) ])
 
   *TRAPEZOIDAL THEOREM*
 
   $ integral^b_z f(x) = (d x)/2[f(a) + 2(f(a + d x) + f(a + 2d x) + f(a + 3d x) + f(a + 4d x) ... ) f(b)] $
-  #figure([ #image("./images/trapezoid.webp", width: 80%) ])
+  #figure([ #image("../images/trapezoid.webp", width: 80%) ])
 ])
 
 #prob([
