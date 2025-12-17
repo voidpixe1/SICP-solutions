@@ -1,4 +1,5 @@
-#let counter = counter("problem")
+#let counter = counter("section1")
+#std.counter("section1").update(1)
 
 #show heading.where(level: 1): subprob => {
   counter.update(1)
