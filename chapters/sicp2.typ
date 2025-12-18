@@ -249,7 +249,7 @@ manipulate procedures, we can get by without numbers (at least insofar as
 nonnegative integers are concerned) by implementing 0 and the operation of
 adding 1 as
 
-```rkt
+```lisp
 (define zero (lambda (f) (lambda (x) x)))
 
 (define (add-1 n)
@@ -274,7 +274,7 @@ Alyssa's program is incomplete
 because she has not specified the implementation of the interval abstraction.
 Here is a definition of the interval constructor:
 
-```rkt
+```lisp
 (define (make-interval a b) (cons a b))
 ```
 
@@ -435,3 +435,150 @@ reverse order:
   ```
 ])
 
+#prob([
+Consider the change-counting
+program of 1.2.2.  It would be nice to be able to easily change
+the currency used by the program, so that we could compute the number of ways
+to change a British pound, for example.  As the program is written, the
+knowledge of the currency is distributed partly into the procedure
+`first-denomination` and partly into the procedure `count-change`
+(which knows that there are five kinds of U.S. coins).  It would be nicer to be
+able to supply a list of coins to be used for making change.
+
+We want to rewrite the procedure `cc` so that its second argument is a
+list of the values of the coins to use rather than an integer specifying which
+coins to use.  We could then have lists that defined each kind of currency:
+
+```lisp
+(define us-coins 
+  (list 50 25 10 5 1))
+
+(define uk-coins 
+  (list 100 50 20 10 5 2 1 0.5))
+```
+
+We could then call `cc` as follows:
+
+```lisp
+(cc 100 us-coins)
+292
+```
+
+To do this will require changing the program `cc` somewhat.  It will still
+have the same form, but it will access its second argument differently, as
+follows:
+
+```lisp
+(define (cc amount coin-values)
+  (cond ((= amount 0) 
+         1)
+        ((or (< amount 0) 
+             (no-more? coin-values)) 
+         0)
+        (else
+         (+ (cc 
+             amount
+             (except-first-denomination 
+              coin-values))
+            (cc 
+             (- amount
+                (first-denomination 
+                 coin-values))
+             coin-values)))))
+```
+
+Define the procedures `first-denomination`,
+`except-first-denomination` and `no-more?` in terms of primitive
+operations on list structures.  Does the order of the list `coin-values`
+affect the answer produced by `cc`?  Why or why not?
+])
+
+#answer([
+  ```lisp
+  (define (no-more? x) (null? x))
+  (define (except-first-denomination x) (cdr x))
+  (define (first-denomination x) (car x))
+  ```
+  shrimple
+])
+
+#prob([
+The procedures `+`,
+`*`, and `list` take arbitrary numbers of arguments. One way to
+define such procedures is to use `define` with dotted-tail notation.  
+In a procedure definition, a parameter list that has a dot before
+the last parameter name indicates that, when the procedure is called, the
+initial parameters (if any) will have as values the initial arguments, as
+usual, but the final parameter's value will be a list of any
+remaining arguments.  For instance, given the definition
+
+```lisp
+(define (f x y . z) ⟨body⟩)
+```
+
+the procedure `f` can be called with two or more arguments.  If we
+evaluate
+
+```lisp
+(f 1 2 3 4 5 6)
+```
+
+
+then in the body of `f`, `x` will be 1, `y` will be 2, and
+`z` will be the list `(3 4 5 6)`.  Given the definition
+
+```lisp
+(define (g . w) ⟨body⟩)
+```
+
+
+the procedure `g` can be called with zero or more arguments.  If we
+evaluate
+
+```lisp
+(g 1 2 3 4 5 6)
+```
+
+
+then in the body of `g`, `w` will be the list `(1 2 3 4 5
+6)`.
+
+Use this notation to write a procedure `same-parity` that takes one or
+more integers and returns a list of all the arguments that have the same
+even-odd parity as the first argument.  For example,
+
+```lisp
+(same-parity 1 2 3 4 5 6 7)
+(1 3 5 7)
+
+(same-parity 2 3 4 5 6 7)
+(2 4 6)
+```
+])
+
+#answer([
+  ```lisp
+(define (same-parity f . x)
+  (cond ((or (null? f) (null? x)) null)
+        ((even? f) (find-even x))
+        ((odd? f) (find-odd x))))
+
+(define (find-even x)
+  (define (help result lst)
+    (cond ((null? lst) result)
+          ((odd? (car lst)) (help result (cdr lst)))
+          ((even? (car lst)) (help (cons (car lst) result) (cdr lst)))))
+  (help null x))
+
+(define (find-odd x)
+  (define (help result lst)
+    (cond ((null? lst) result)
+          ((even? (car lst)) (help result (cdr lst)))
+          ((odd? (car lst)) (help (cons (car lst) result) (cdr lst)))))
+  (help null x))
+
+(same-parity 8 2 3 4 5 6)
+; '(6 4 2)
+  ```
+  ok so this is giving the solution  in reverse, and i know the reason BUT idk how to make append such that it appends a pair and a "non-pair" without messing up the tree
+])
