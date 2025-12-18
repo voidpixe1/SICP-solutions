@@ -435,6 +435,3 @@ reverse order:
   ```
 ])
 
-#prob([
-
-])
