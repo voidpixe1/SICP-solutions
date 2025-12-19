@@ -582,3 +582,238 @@ even-odd parity as the first argument.  For example,
   ```
   ok so this is giving the solution  in reverse, and i know the reason BUT idk how to make append such that it appends a pair and a "non-pair" without messing up the tree
 ])
+
+#prob([
+The procedure `square-list`
+takes a list of numbers as argument and returns a list of the squares of those
+numbers.
+
+```lisp
+(square-list (list 1 2 3 4))
+(1 4 9 16)
+```
+
+Here are two different definitions of `square-list`.  Complete both of
+them by filling in the missing expressions:
+
+```lisp
+(define (square-list items)
+  (if (null? items)
+      nil
+      (cons ⟨??⟩ ⟨??⟩)))
+
+(define (square-list items)
+  (map ⟨??⟩ ⟨??⟩))
+```
+])
+
+#answer([
+  ```lisp
+(define (square-list items)
+  (if (null? items)
+      null
+      (cons (* (car items) (car items)) (square-list (cdr items)))))
+
+(define (square-list-2 items)
+  (map (lambda (x) (* x x)) items))
+  ```
+])
+
+#prob([
+Louis Reasoner tries to rewrite
+the first `square-list` procedure of Exercise 2.21 so that it
+evolves an iterative process:
+
+```lisp
+(define (square-list items)
+  (define (iter things answer)
+    (if (null? things)
+        answer
+        (iter (cdr things)
+              (cons (square (car things))
+                    answer))))
+  (iter items nil))
+```
+
+Unfortunately, defining `square-list` this way produces the answer list in
+the reverse order of the one desired.  Why?
+
+Louis then tries to fix his bug by interchanging the arguments to `cons`:
+
+```lisp
+(define (square-list items)
+  (define (iter things answer)
+    (if (null? things)
+        answer
+        (iter (cdr things)
+              (cons answer
+                    (square 
+                     (car things))))))
+  (iter items nil))
+```
+
+This doesn't work either.  Explain.
+])
+
+#answer([
+  ok this is the EXACT issue i had with `Exercise 2.20` and i understand that in the first one it is pretty obvious, you're appending the _new value_ to the _old value which already HAS a list of the squares of the previous elements_
+
+  in the second one though we get
+```lisp
+(square-list (list 1 2 3 4))
+;'((((() . 1) . 4) . 9) . 16)
+```
+  so this is clearly doing 
+```lisp
+(cons (cons (cons (cons null 1) 4) 9) 16)
+```
+])
+
+#prob([
+The procedure `for-each` is
+similar to `map`.  It takes as arguments a procedure and a list of
+elements.  However, rather than forming a list of the results, `for-each`
+just applies the procedure to each of the elements in turn, from left to right.
+The values returned by applying the procedure to the elements are not used at
+all---`for-each` is used with procedures that perform an action, such as
+printing.  For example,
+
+```lisp
+(for-each 
+ (lambda (x) (newline) (display x))
+ (list 57 321 88))
+
+57
+321
+88
+```
+
+The value returned by the call to `for-each` (not illustrated above) can
+be something arbitrary, such as true.  Give an implementation of
+`for-each`.
+])
+
+#answer([
+  ```lisp
+(define (for-each proc items)
+  (proc (car items))
+  (if (null? (cdr items)) true
+      (for-each proc (cdr items))))
+
+(for-each (lambda (x) (newline)
+                      (display x)
+                      (display "->")
+                      (display (square x))) (list 1 2 3 4 5))
+; 1->1
+; 2->4
+; 3->9
+; 4->16
+; 5->25#t
+  ```
+])
+
+#prob([
+  Suppose we evaluate the
+  expression `(list 1 (list 2 (list 3 4)))`.  Give the result printed by the
+  interpreter, the corresponding box-and-pointer structure, and the
+  interpretation of this as a tree (as in Figure 2.6).
+])
+
+#answer([
+  #grid(
+    align: center,
+    columns: (auto, auto),    
+    gutter: 10pt, [
+  ```lisp
+(list 1 (list 2 (list 3 4)))
+; (1 (2 (3 4)))
+  ```
+  ], [ #image("../images/hmmm.png", width: 60%) ])
+])
+
+#prob([
+Give combinations of `car`s
+and `cdr`s that will pick 7 from each of the following lists:
+
+```lisp
+(1 3 (5 7) 9)
+((7))
+(1 (2 (3 (4 (5 (6 7))))))
+```
+])
+
+#answer([
+  ```lisp
+(define l1 (list 1 3 (list 5 7) 9))
+(define l2 (list (list 7)))
+(define l3 (list 1 (list 2 (list 3 (list 4 (list 5 (list 6 7)))))))
+(car (cdr (car (cdr (cdr l1)))))
+(car (car l2))
+(car
+  (cdr
+    (car
+      (cdr
+        (car
+          (cdr                            ; stairs :O
+            (car
+              (cdr
+                (car
+                  (cdr
+                    (car
+                      (cdr l3)))))))))))) ;(what even is this question bro XD)
+  ```
+])
+
+#prob([
+Suppose we define `x` and
+`y` to be two lists:
+
+```lisp
+(define x (list 1 2 3))
+(define y (list 4 5 6))
+```
+
+What result is printed by the interpreter in response to evaluating each of the
+following expressions:
+
+```lisp
+(append x y)
+(cons x y)
+(list x y)
+```
+])
+
+#answer([
+  ```lisp
+(append x y)
+; '(1 2 3 4 5 6)
+(cons x y)
+; '((1 2 3) 4 5 6)
+(list x y)
+; '((1 2 3) (4 5 6))
+  ```
+])
+
+#prob([
+Modify your `reverse`
+procedure of Exercise 2.18 to produce a `deep-reverse` procedure
+that takes a list as argument and returns as its value the list with its
+elements reversed and with all sublists deep-reversed as well.  For example,
+
+```lisp
+(define x 
+  (list (list 1 2) (list 3 4)))
+
+x
+((1 2) (3 4))
+
+(reverse x)
+((3 4) (1 2))
+
+(deep-reverse x)
+((4 3) (2 1))
+```
+])
+
+#answer([
+])
