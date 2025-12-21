@@ -433,6 +433,15 @@ reverse order:
 (reverse (list 1 2 3 4))
 ; '(4 3 2 1)
   ```
+  also an iterative one for good measure btw
+  ```lisp
+(define (reverse-iter l)
+  (define (helper result l)
+    (if (null? l) result
+        (helper (cons (car l) result)
+                (cdr l))))
+  (helper null l))
+  ```
 ])
 
 #prob([
@@ -728,7 +737,7 @@ be something arbitrary, such as true.  Give an implementation of
 (list 1 (list 2 (list 3 4)))
 ; (1 (2 (3 4)))
   ```
-  ], [ #image("../images/hmmm.png", width: 60%) ])
+  ], [ #image("../images/2-24.png", width: 60%) ])
 ])
 
 #prob([
@@ -812,6 +821,204 @@ x
 
 (deep-reverse x)
 ((4 3) (2 1))
+```
+])
+
+#answer([
+```lisp
+(define (reverse l)
+  (define (helper result l)
+    (if (null? l) result
+        (helper (cons (car l) result)
+                (cdr l))))
+  (helper null l))
+
+(define (deep-reverse x)
+  (if (not (pair? x))
+      x
+      (reverse x)))
+  ```
+])
+
+#prob([
+Write a procedure `fringe`
+that takes as argument a tree (represented as a list) and returns a list whose
+elements are all the leaves of the tree arranged in left-to-right order.  For
+example,
+
+```lisp
+(define x 
+  (list (list 1 2) (list 3 4)))
+
+(fringe x)
+(1 2 3 4)
+
+(fringe (list x x))
+(1 2 3 4 1 2 3 4)
+```
+])
+
+#answer([
+ok so this one is wrong BUT it needs a _tiny_ bit of correction
+```lisp
+(define (fringe lst)
+  (cond ((null? lst) null)
+        ((not (pair? lst)) lst)
+        (else (append (fringe (car lst))
+                      (fringe (cdr lst))))))
+
+(fringe '((1 2) (3 4) 9))
+; append: contract violation
+  ```
+instead of returning the fringe as is _if not a pair_ we should return it by _making it a pair_
+  ```lisp
+(define (fringe lst)
+  (cond ((null? lst) null)
+        ((not (pair? lst)) (cons lst null))
+        (else (append (fringe (car lst))
+                      (fringe (cdr lst))))))
+
+(fringe '((1 2) (3 4) 9))
+; '(1 2 3 4 9)
+  ```
+  i basically copied the `count-leves` program in the example
+])
+
+#prob([
+A binary mobile consists of two
+branches, a left branch and a right branch.  Each branch is a rod of a certain
+length, from which hangs either a weight or another binary mobile.  We can
+represent a binary mobile using compound data by constructing it from two
+branches (for example, using `list`):
+
+```lisp
+(define (make-mobile left right)
+  (list left right))
+```
+
+A branch is constructed from a `length` (which must be a number) together
+with a `structure`, which may be either a number (representing a simple
+weight) or another mobile:
+
+```lisp
+(define (make-branch length structure)
+  (list length structure))
+```
+
+*1.* Write the corresponding selectors `left-branch` and `right-branch`,
+which return the branches of a mobile, and `branch-length` and
+`branch-structure`, which return the components of a branch.
+
+*2.* Using your selectors, define a procedure `total-weight` that returns the
+total weight of a mobile.
+
+*3.* A mobile is said to be balanced if the torque applied by its top-left
+branch is equal to that applied by its top-right branch (that is, if the length
+of the left rod multiplied by the weight hanging from that rod is equal to the
+corresponding product for the right side) and if each of the submobiles hanging
+off its branches is balanced. Design a predicate that tests whether a binary
+mobile is balanced.
+
+*4.* Suppose we change the representation of mobiles so that the constructors are
+
+```lisp
+(define (make-mobile left right)
+  (cons left right))
+
+(define (make-branch length structure)
+  (cons length structure))
+```
+
+How much do you need to change your programs to convert to the new
+representation?
+])
+
+#answer([
+  TODO (it's easy........i think)
+])
+
+#prob([
+  Define a procedure
+  `square-tree` analogous to the `square-list` procedure of
+  Exercise 2.21.  That is, `square-tree` should behave as follows:
+
+  ```lisp
+  (square-tree
+  (list 1
+  (list 2 (list 3 4) 5)
+  (list 6 7)))
+  (1 (4 (9 16) 25) (36 49))
+  ```
+
+  Define `square-tree` both directly (i.e., without using any higher-order
+  procedures) and also by using `map` and recursion.
+])
+
+#answer([
+  ```lisp
+(define (square-tree tree)
+  (cond ((null? tree) null)
+        ((not (pair? tree)) (square tree))
+        (else (cons (square-tree (car tree))
+                    (square-tree (cdr tree))))))
+
+(define (square-tree-map tree)
+  (define (sub-tree x)
+    (if (not (pair? x))
+        (square x)
+        (square-tree-map x)))
+  (map sub-tree tree))
+
+(list 1 (list 2 (list 3 4) 5) (list 6 7))
+; '(1 (2 (3 4) 5) (6 7))
+(square-tree (list 1 (list 2 (list 3 4) 5) (list 6 7)))
+; '(1 (4 (9 16) 25) (36 49))
+(square-tree-map (list 1 (list 2 (list 3 4) 5) (list 6 7)))
+; '(1 (4 (9 16) 25) (36 49))
+  ```
+])
+
+#prob([
+Abstract your answer to
+Exercise 2.30 to produce a procedure `tree-map` with the property
+that `square-tree` could be defined as
+
+```lisp
+(define (square-tree tree) 
+  (tree-map square tree))
+```
+])
+
+#answer([
+  ```lisp
+(define (tree-map proc tree)
+  (cond ((null? tree) null)
+        ((not (pair? tree)) (proc tree))
+        (else (cons (tree-map proc (car tree))
+                    (tree-map proc (cdr tree))))))
+
+(define (sus x)
+  (tree-map square x))
+
+(sus (list 1 (list 2 (list 3 4) 5) (list 6 7)))
+; '(1 (4 (9 16) 25) (36 49))
+  ```
+])
+
+#prob([
+We can represent a set as a list
+of distinct elements, and we can represent the set of all subsets of the set as
+a list of lists.  For example, if the set is `(1 2 3)`, then the set of
+all subsets is `(() (3) (2) (2 3) (1) (1 3) (1 2) (1 2 3))`.  Complete the
+following definition of a procedure that generates the set of subsets of a set
+and give a clear explanation of why it works:
+
+```lisp
+(define (subsets s)
+  (if (null? s)
+      (list nil)
+      (let ((rest (subsets (cdr s))))
+        (append rest (map ⟨??⟩ rest)))))
 ```
 ])
 
