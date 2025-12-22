@@ -881,7 +881,7 @@ instead of returning the fringe as is _if not a pair_ we should return it by _ma
 (fringe '((1 2) (3 4) 9))
 ; '(1 2 3 4 9)
   ```
-  i basically copied the `count-leves` program in the example
+  i basically copied the `count-leaves` program in the example
 ])
 
 #prob([
@@ -1036,4 +1036,346 @@ and give a clear explanation of why it works:
 ])
 
 #prob([
+Fill in the missing expressions
+to complete the following definitions of some basic list-manipulation
+operations as accumulations:
+
+```lisp
+(define (map p sequence)
+  (accumulate (lambda (x y) ⟨??⟩) 
+              nil sequence))
+
+(define (append seq1 seq2)
+  (accumulate cons ⟨??⟩ ⟨??⟩))
+
+(define (length sequence)
+  (accumulate ⟨??⟩ 0 sequence))
+```
+])
+
+#answer([
+  ```lisp
+(define (map-test p sequence)
+  (accumulate (lambda (acc y) (cons (p y) acc))
+              null sequence))
+
+(define (append seq1 seq2)
+  (accumulate cons seq1 seq2))
+
+(define (length sequence)
+  (accumulate (lambda (_ acc) (+ acc 1)) 0 sequence))
+  ```
+])
+
+#prob([
+Evaluating a polynomial in $x$
+at a given value of $x$ can be formulated as an accumulation.  We evaluate
+the polynomial
+
+$ a_n x^n + a_(n-1) x^(n-1) + dots + a_1 x + a_0 $
+
+
+using a well-known algorithm called Horner's rule, which structures
+the computation as
+
+$ (dots (a_n x + a_(n-1)) x + dots + a_1) x + a_0 $
+
+
+In other words, we start with $a_n$, multiply by $x$, add
+$a_(n-1)$, multiply by $x$, and so on, until we reach
+$a_0$.
+
+Fill in the following template to produce a procedure that evaluates a
+polynomial using Horner's rule.  Assume that the coefficients of the polynomial
+are arranged in a sequence, from $a_0$ through $a_n$.
+
+```lisp
+(define 
+  (horner-eval x coefficient-sequence)
+  (accumulate 
+   (lambda (this-coeff higher-terms)
+     ⟨??⟩)
+   0
+   coefficient-sequence))
+```
+
+For example, to compute $1 + 3x + 5x^3 + x^5$ at $x = 2$ you
+would evaluate
+
+```lisp
+(horner-eval 2 (list 1 3 0 5 0 1))
+```
+])
+
+#answer([
+```lisp
+(define (horner-eval x coefficient-sequence)
+  (accumulate 
+   (lambda (this-coeff higher-terms)
+     (+ this-coeff (* higher-terms x)))
+   0
+   coefficient-sequence))
+  ```
+])
+
+#prob([
+Redefine `count-leaves` from
+2.2.2 as an accumulation:
+
+```lisp
+(define (count-leaves t)
+  (accumulate ⟨??⟩ ⟨??⟩ (map ⟨??⟩ ⟨??⟩)))
+```
+])
+
+#answer([
+  ```lisp
+(define (count-leaves-test t)
+  (accumulate (lambda (y x)
+                (+ x y))
+              0
+              (map (lambda (x)
+                     (if (not (pair? x))
+                         1
+                         (count-leaves-test x)))
+                   t)))
+
+(count-leaves-test (list (list 1 23) 1 2 3))
+; 5
+  ```
+])
+
+#prob([
+The procedure `accumulate-n`
+is similar to `accumulate` except that it takes as its third argument a
+sequence of sequences, which are all assumed to have the same number of
+elements.  It applies the designated accumulation procedure to combine all the
+first elements of the sequences, all the second elements of the sequences, and
+so on, and returns a sequence of the results.  For instance, if `s` is a
+sequence containing four sequences, `((1 2 3) (4 5 6) (7 8 9) (10 11
+12)),` then the value of `(accumulate-n + 0 s)` should be the sequence
+`(22 26 30)`.  Fill in the missing expressions in the following definition
+of `accumulate-n`:
+
+```lisp
+(define (accumulate-n op init seqs)
+  (if (null? (car seqs))
+      nil
+      (cons (accumulate op init ⟨??⟩)
+            (accumulate-n op init ⟨??⟩))))
+```
+])
+
+#answer([
+```lisp
+(define (accumulate-n op init seqs)
+  (if (null? (car seqs))
+      null
+      (cons (accumulate op init (map car seqs))
+            (accumulate-n op init (map cdr seqs)))))
+  ```
+  this one i didn't think of,\
+  i am still not getting used to the idea of thinking in a higher level of abstraction of map and acc i guess
+])
+
+#prob([
+Suppose we represent vectors $v = (v_i)$ as sequences of numbers, and
+matrices $m=(m_(i j))$ as sequences of vectors (the rows of the
+matrix).  For example, the matrix
+
+  $
+  mat(
+    1,2,3,4;
+    4,5,6,6;
+    6,7,8,9;
+  )
+  $
+
+
+is represented as the sequence `((1 2 3 4) (4 5 6 6) (6 7 8 9))`.  With
+this representation, we can use sequence operations to concisely express the
+basic matrix and vector operations.  These operations (which are described in
+any book on matrix algebra) are the following:
+  #align(center)[
+    (dot-product v w) returns $Sigma_i v_i w_i$\
+    (matrix-\*-vector m v) returns the vector *t* where $t_i = Sigma_j m_(i j) w_i$\
+    (matrix-\*-vector m n) returns the vector *p* where $p_(i j) = Sigma_k m_(i k) n_(k j)$\
+    (transpose m) returns the vector *n* where $n_(i j) = m_(j i)$\
+  ]
+
+We can define the dot product as
+
+```lisp
+(define (dot-product v w)
+  (accumulate + 0 (map * v w)))
+```
+
+Fill in the missing expressions in the following procedures for computing the
+other matrix operations.  (The procedure `accumulate-n` is defined in
+Exercise 2.36.)
+
+```lisp
+(define (matrix-*-vector m v)
+  (map ⟨??⟩ m))
+
+(define (transpose mat)
+  (accumulate-n ⟨??⟩ ⟨??⟩ mat))
+
+(define (matrix-*-matrix m n)
+  (let ((cols (transpose n)))
+    (map ⟨??⟩ m)))
+```
+])
+
+#answer([
+  ```lisp
+(define (dot-product v w)
+  (accumulate + 0 (map * v w)))
+
+(define (matrix-vector m v)
+  (map (lambda (x) (dot-product x v)) m))
+
+(define (transpose mat)
+  (accumulate-n cons null mat))
+
+(define (matrix-matrix m n)
+  (let ((cols (transpose n)))
+    (map (lambda (row) (matrix-vector cols row)) m)))
+
+(define m1 (list (list 1 2) (list 3 4)))
+(define m2 (list (list 2 0) (list 1 2)))
+(matrix-matrix m1 m2)
+; '((4 4) (10 8))
+  ```
+])
+
+#prob([
+The `accumulate` procedure
+is also known as `fold-right`, because it combines the first element of
+the sequence with the result of combining all the elements to the right.  There
+is also a `fold-left`, which is similar to `fold-right`, except that
+it combines elements working in the opposite direction:
+
+```lisp
+(define (fold-left op initial sequence)
+  (define (iter result rest)
+    (if (null? rest)
+        result
+        (iter (op result (car rest))
+              (cdr rest))))
+  (iter initial sequence))
+```
+
+What are the values of
+
+```lisp
+(fold-right / 1 (list 1 2 3))
+(fold-left  / 1 (list 1 2 3))
+(fold-right list nil (list 1 2 3))
+(fold-left  list nil (list 1 2 3))
+```
+
+Give a property that `op` should satisfy to guarantee that
+`fold-right` and `fold-left` will produce the same values for any
+sequence.
+])
+
+#answer([
+  ```lisp
+(fold-right / 1 (list 1 2 3))
+(fold-left  / 1 (list 1 2 3))
+(fold-right list nil (list 1 2 3))
+(fold-left  list nil (list 1 2 3))
+; 3/2
+; 1/6
+; '(1 (2 (3 ())))
+; '(((() 1) 2) 3)
+  ```
+  ```lisp
+(fold-right (lambda (y x) 
+              (display x)
+              (display " dividing ")
+              (display y)
+              (display " -> ")
+              (/ y x)) 1 (list 1 2 3))
+(fold-left (lambda (y x)
+             (display x)
+             (display " dividing ")
+             (display y)
+             (display " -> ")
+             (/ y x)) 1 (list 1 2 3))
+; 1 dividing 3 -> 3 dividing 2 -> 2/3 dividing 1 -> 3/2
+; 1 dividing 1 -> 2 dividing 1 -> 3 dividing 1/2 -> 1/6
+  ```
+  we want it such that the _order_ of op does not matter on the result
+  i.e\
+  like in addition $(a+b)+c = a+(b+c)$\
+  or multiplication $(a*b)*c = a*(b*c)$
+  so we want it such that
+  `(op (op a b) c) == (op a (op b c))`
+])
+
+#prob([
+Complete the following
+definitions of `reverse` (Exercise 2.18) in terms of
+`fold-right` and `fold-left` from Exercise 2.38:
+
+```lisp
+(define (reverse sequence)
+  (fold-right 
+   (lambda (x y) ⟨??⟩) nil sequence))
+
+(define (reverse sequence)
+  (fold-left 
+   (lambda (x y) ⟨??⟩) nil sequence))
+```
+])
+
+#answer([
+  ```lisp
+(define (reverse-test sequence)
+  (accumulate
+   (lambda (x y) (append  y (list x))) null sequence))
+
+(define (reverse2-test sequence)
+  (fold-left
+   (lambda (x y) (append (list y) x)) null sequence))
+
+(reverse-test (list 1 2 3 4))
+(reverse2-test (list 1 2 3 4))
+; '(4 3 2 1)
+; '(4 3 2 1)
+  ```
+])
+
+#prob([
+Define a procedure
+`unique-pairs` that, given an integer $n$, generates the sequence of
+pairs $(i, j)$ with $(1 < j < (i < n))$.  Use `unique-pairs`
+to simplify the definition of `prime-sum-pairs` given above.
+])
+
+#answer([
+  ```lisp
+(define (unique-pairs n)
+  (flatmap (lambda (i)
+             (map (lambda (j) (list i j))
+                  (enumerate-interval 1 (- i 1))))
+           (enumerate-interval 1 n)))
+
+(unique-pairs 4)
+; '((2 1) (3 1) (3 2) (4 1) (4 2) (4 3))
+
+(define (prime-sum-pairs n)
+  (define (make-pair-sum pair)
+    (list (car pair) (cadr pair) (+ (car pair) (cadr pair))))
+  (define (prime-sum? pair)
+    (prime? (+ (car pair) (cadr pair))))
+  (map make-pair-sum
+       (filter prime-sum?
+               (unique-pairs n))))
+
+(prime-sum-pairs 5)
+; '((2 1 3) (3 2 5) (4 1 5) (4 3 7) (5 2 7))
+  ```
 ])
