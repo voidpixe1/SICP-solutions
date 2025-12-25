@@ -1,3 +1,5 @@
+#import "@preview/board-n-pieces:0.7.0": board, position
+
 #let counter = counter("section2")
 #std.counter("section2").update(1)
 
@@ -9,7 +11,6 @@
 #let prob(body) = {
   context [ == Exercise #counter.step() #counter.display() ]
   block(
-    breakable: false,
     width: 100%,
     inset: 1em,
     stroke:black,
@@ -1378,4 +1379,114 @@ to simplify the definition of `prime-sum-pairs` given above.
 (prime-sum-pairs 5)
 ; '((2 1 3) (3 2 5) (4 1 5) (4 3 7) (5 2 7))
   ```
+])
+
+#prob([
+Write a procedure to find all
+ordered triples of distinct positive integers $i$, $j$, and $k$ less than
+or equal to a given integer $n$ that sum to a given integer $s$.
+])
+
+#answer([
+HOLY SHIT this one took a long while
+(first time discovering leetcode three-sum)
+  ```lisp
+(define (unique-triplet n)
+  (flatmap (lambda (i)
+             (map (lambda (j)
+                    (cons j i))
+                  (enumerate-interval (+ 1 (car i)) n)))
+           (unique-pairs n)))
+
+(define (three-sum n s)
+  (define (condition? t)
+    (eq? s
+         (+ (car t)
+            (cadr t)
+            (caddr t))))
+  (filter condition? (unique-triplet n)))
+
+(three-sum 10 15)
+; '((10 3 2) (10 4 1) (9 4 2) (8 4 3) (9 5 1) (8 5 2) (7 5 3) (6 5 4) (8 6 1) (7 6 2))
+  ```
+])
+
+#prob([
+  The “eight queens puzzle” asks how to place eight queens on a
+  chessboard so that no queeds is in check from any other
+  (i.e., no two queems are in the same row, column,
+  or diagonal). One possible solution is shown below.
+  #align(center, [
+    #board(
+      square-size: 20pt,
+      white-square-fill: rgb("#ffffff"),
+      black-square-fill: rgb("#cdcdcd"),
+      stroke: rgb("#cdcdcd"),
+      position(
+        ".....q..",
+        "..q.....",
+        "q.......",
+        "......q.",
+        "....q...",
+        ".......q",
+        ".q......",
+        "...q....",
+      ))
+  ])
+
+  One way to solve the puzzle is
+  to work across the board, placing a queen in each column.  Once we have placed
+  $k - 1$ queens, we must place the $k^(t h)$ queen in a position where it does
+  not check any of the queens already on the board.  We can formulate this
+  approach recursively: Assume that we have already generated the sequence of all
+  possible ways to place $k - 1$ queens in the first $k - 1$ columns of the
+  board.  For each of these ways, generate an extended set of positions by
+  placing a queen in each row of the $k^(t h)$ column.  Now filter these, keeping
+  only the positions for which the queen in the $k^(t h)$ column is safe with
+  respect to the other queens.  This produces the sequence of all ways to place
+  $k$ queens in the first $k$ columns.  By continuing this process, we will
+  produce not only one solution, but all solutions to the puzzle.
+
+  We implement this solution as a procedure `queens`, which returns a
+  sequence of all solutions to the problem of placing $n$ queens on an
+  $n times n$ chessboard.  `Queens` has an internal procedure
+  `queen-cols` that returns the sequence of all ways to place queens in the
+  first $k$ columns of the board.
+
+  ```lisp
+(define (queens board-size)
+  (define (queen-cols k)
+    (if (= k 0)
+        (list empty-board)
+        (filter
+          (lambda (positions) 
+            (safe? k positions))
+          (flatmap
+            (lambda (rest-of-queens)
+              (map (lambda (new-row)
+                     (adjoin-position 
+                       new-row 
+                       k 
+                       rest-of-queens))
+                   (enumerate-interval 
+                     1 
+                     board-size)))
+            (queen-cols (- k 1))))))
+  (queen-cols board-size))
+  ```
+
+  In this procedure `rest-of-queens` is a way to place $k - 1$ queens in
+  the first $k - 1$ columns, and `new-row` is a proposed row in which to
+  place the queen for the $k^(t h)$ column.  Complete the program by implementing
+  the representation for sets of board positions, including the procedure
+  `adjoin-position`, which adjoins a new row-column position to a set of
+  positions, and `empty-board`, which represents an empty set of positions.
+  You must also write the procedure `safe?`, which determines for a set of
+  positions, whether the queen in the $k^(t h)$ column is safe with respect to the
+  others.  (Note that we need only check whether the new queen is safe---the
+  other queens are already guaranteed safe with respect to each other.)
+])
+
+#answer([
+  honestly.........this problem made me shit my pants to not touch exercises for 2 days straight
 ])
