@@ -239,8 +239,31 @@ endpoints).  To try your procedures, you'll need a way to print points:
 ])
 
 #answer([
-  ok for this one i am totally blank tbh
-  TODO
+  ```lisp
+(define (log base n)
+  (define (helper prod k)
+    (if (eq? (gcd prod n)
+             prod)
+        (helper (* base prod)
+                (+ k 1))
+        k))
+  (helper base 0))
+
+(define (power n m)
+  (if (< m 1)
+      1
+      (* (power n (- m 1))
+         n)))
+
+(define (my-cons a b)
+  (* (power 2 a)
+     (power 3 b)))
+(define (my-car x)
+  (log 2 x))
+(define (my-cdr x)
+  (log 3 x))
+  ```
+
 ])
 
 #prob([
@@ -267,7 +290,36 @@ repeated application of `add-1`).
 ])
 
 #answer([
-  TODO
+
+applying add-1 to zero will give us the value of one
+so lets do that
+  ```lisp
+(add-1 zero)
+((λ (f)
+   (λ (x)
+     (f ((n f) x)))) zero)
+
+(λ (f)
+   (λ (x)
+     (f ((zero f) x))))
+
+(λ (f)
+   (λ (x)
+     (f (((λ (f)
+           (λ (x) x)) f) x))))
+
+(λ (f)
+   (λ (x)
+     (f ((λ (x) x) x))))
+
+(λ (f)
+   (λ (x)
+     (f ((λ (x) x) x))))
+
+(λ (f)
+   (λ (x)
+     (f x))) ; this is one (this sht was so fucking ass T-T)
+  ```
 ])
 
 #prob([
@@ -906,21 +958,21 @@ weight) or another mobile:
   (list length structure))
 ```
 
-*1.* Write the corresponding selectors `left-branch` and `right-branch`,
+1. Write the corresponding selectors `left-branch` and `right-branch`,
 which return the branches of a mobile, and `branch-length` and
 `branch-structure`, which return the components of a branch.
 
-*2.* Using your selectors, define a procedure `total-weight` that returns the
+2. Using your selectors, define a procedure `total-weight` that returns the
 total weight of a mobile.
 
-*3.* A mobile is said to be balanced if the torque applied by its top-left
+3. A mobile is said to be balanced if the torque applied by its top-left
 branch is equal to that applied by its top-right branch (that is, if the length
 of the left rod multiplied by the weight hanging from that rod is equal to the
 corresponding product for the right side) and if each of the submobiles hanging
 off its branches is balanced. Design a predicate that tests whether a binary
 mobile is balanced.
 
-*4.* Suppose we change the representation of mobiles so that the constructors are
+4. Suppose we change the representation of mobiles so that the constructors are
 
 ```lisp
 (define (make-mobile left right)
@@ -1433,7 +1485,6 @@ HOLY SHIT this one took a long while
         "...q....",
       ))
   ])
-
   One way to solve the puzzle is
   to work across the board, placing a queen in each column.  Once we have placed
   $k - 1$ queens, we must place the $k^(t h)$ queen in a position where it does
@@ -1488,5 +1539,439 @@ HOLY SHIT this one took a long while
 ])
 
 #answer([
-  honestly.........this problem made me shit my pants to not touch exercises for 2 days straight
+
+])
+
+#prob([
+Louis Reasoner is having a
+terrible time doing Exercise 2.42.  His `queens` procedure seems to
+work, but it runs extremely slowly.  (Louis never does manage to wait long
+enough for it to solve even the $6 times 6$ case.)  When Louis asks Eva Lu Ator for
+help, she points out that he has interchanged the order of the nested mappings
+in the `flatmap`, writing it as
+
+```lisp
+(flatmap
+ (lambda (new-row)
+   (map (lambda (rest-of-queens)
+          (adjoin-position 
+           new-row k rest-of-queens))
+        (queen-cols (- k 1))))
+ (enumerate-interval 1 board-size))
+```
+
+Explain why this interchange makes the program run slowly.  Estimate how long
+it will take Louis's program to solve the eight-queens puzzle, assuming that
+the program in Exercise 2.42 solves the puzzle in time $T$.
+])
+
+#answer([
+  FUCK
+])
+
+#prob([
+Define the procedure
+`up-split` used by `corner-split`.  It is similar to
+`right-split`, except that it switches the roles of `below` and
+`beside`.
+])
+
+#answer([
+])
+
+#prob([
+`Right-split` and
+`up-split` can be expressed as instances of a general splitting operation.
+Define a procedure `split` with the property that evaluating
+
+```lisp
+(define right-split (split beside below))
+(define up-split (split below beside))
+```
+
+produces procedures `right-split` and `up-split` with the same
+behaviors as the ones already defined.
+])
+
+#answer([
+])
+
+#prob([
+A two-dimensional vector $v$
+running from the origin to a point can be represented as a pair consisting of
+an $x$-coordinate and a $y$-coordinate.  Implement a data abstraction for
+vectors by giving a constructor `make-vect` and corresponding selectors
+`xcor-vect` and `ycor-vect`.  In terms of your selectors and
+constructor, implement procedures `add-vect`, `sub-vect`, and
+`scale-vect` that perform the operations vector addition, vector
+subtraction, and multiplying a vector by a scalar:
+
+$
+(x_1, y_1) + (x_2, y_2)  =  (x_1 + x_2, y_1 + y_2) \
+(x_1, y_1) - (x_2, y_2)  =  (x_1 - x_2, y_1 - y_2) \
+s dot (x, y) =  (s x, s y)
+$
+])
+
+#answer([
+])
+
+#prob([
+Here are two possible
+constructors for frames:
+
+```lisp
+(define (make-frame origin edge1 edge2)
+  (list origin edge1 edge2))
+
+(define (make-frame origin edge1 edge2)
+  (cons origin (cons edge1 edge2)))
+```
+
+For each constructor supply the appropriate selectors to produce an
+implementation for frames.
+])
+
+#answer([
+])
+
+#prob([
+A directed line segment in the
+plane can be represented as a pair of vectors---the vector running from the
+origin to the start-point of the segment, and the vector running from the
+origin to the end-point of the segment.  Use your vector representation from
+Exercise 2.46 to define a representation for segments with a constructor
+`make-segment` and selectors `start-segment` and `end-segment`.
+])
+
+#answer([
+])
+
+#prob([
+Use `segments->painter`
+to define the following primitive painters:
+
+1. The painter that draws the outline of the designated frame.
+
+2. The painter that draws an ``X'' by connecting opposite corners of the frame.
+
+3. The painter that draws a diamond shape by connecting the midpoints of the sides
+of the frame.
+
+4. The `wave` painter.
+])
+
+#answer([
+])
+
+#prob([
+Define the transformation
+`flip-horiz`, which flips painters horizontally, and transformations that
+rotate painters counterclockwise by 180 degrees and 270 degrees.
+])
+
+#answer([
+])
+
+#prob([
+Define the `below` operation
+for painters.  `Below` takes two painters as arguments.  The resulting
+painter, given a frame, draws with the first painter in the bottom of the frame
+and with the second painter in the top.  Define `below` in two different
+ways---first by writing a procedure that is analogous to the `beside`
+procedure given above, and again in terms of `beside` and suitable
+rotation operations (from Exercise 2.50).
+])
+
+#answer([
+])
+
+#prob([
+Make changes to the square limit
+of `wave` shown in Figure 2.9 by working at each of the levels
+described above.  In particular:
+
+1. Add some segments to the primitive `wave` painter of Exercise 2.49
+(to add a smile, for example).
+
+2. Change the pattern constructed by `corner-split` (for example, by using
+only one copy of the `up-split` and `right-split` images instead of
+two).
+
+3. Modify the version of `square-limit` that uses `square-of-four` so as
+to assemble the corners in a different pattern.  (For example, you might make
+the big Mr. Rogers look outward from each corner of the square.)
+])
+
+#answer([
+])
+
+#prob([
+What would the interpreter print
+in response to evaluating each of the following expressions?
+
+```lisp
+(list 'a 'b 'c)
+(list (list 'george))
+(cdr '((x1 x2) (y1 y2)))
+(cadr '((x1 x2) (y1 y2)))
+(pair? (car '(a short list)))
+(memq 'red '((red shoes) (blue socks)))
+(memq 'red '(red shoes blue socks))
+```
+])
+#answer([
+  expected:
+  ```lisp
+(list 'a 'b 'c)
+;; '(a b c)
+(list (list 'george))
+;; '((george))
+(cdr '((x1 x2) (y1 y2)))
+;; '((y1 y2))
+(cadr '((x1 x2) (y1 y2)))
+;; '(y1 y2)
+(pair? (car '(a short list)))
+;; false
+(memq 'red '((red shoes) (blue socks)))
+;; false
+(memq 'red '(red shoes blue socks))
+;; '(red shoes blue socks)
+  ```
+
+  .....it is correct :>
+])
+
+#prob([
+Two lists are said to be
+`equal?` if they contain equal elements arranged in the same order.  For
+example,
+
+```lisp
+(equal? '(this is a list) 
+        '(this is a list))
+```
+
+
+is true, but
+
+```lisp
+(equal? '(this is a list) 
+        '(this (is a) list))
+```
+
+
+is false.  To be more precise, we can define `equal?`  recursively in
+terms of the basic `eq?` equality of symbols by saying that `a` and
+`b` are `equal?` if they are both symbols and the symbols are
+`eq?`, or if they are both lists such that `(car a)` is `equal?`
+to `(car b)` and `(cdr a)` is `equal?` to `(cdr b)`.  Using
+this idea, implement `equal?` as a procedure.
+])
+
+#answer([
+  initially i did `(eq? (car a) (car b))` but then i remembered that
+  `(my-equal? '(this (is a) list) '(this (is a) list)) ` exists
+  ```lisp
+(define (my-equal? a b)
+  (cond ((and (null? a) (null? b)) true)
+        ((or (null? a) (null? b)) false)
+        ((and (not (pair? a)) 
+              (not (pair? b)))
+         (eq? a b))
+        ((or (not (pair? a))
+             (not (pair? b)))
+         false)
+        (else (and (my-equal? (car a) (car b))
+                   (my-equal? (cdr a) (cdr b))))))
+  ```
+])
+
+#prob([
+
+Eva Lu Ator types to the interpreter the expression
+
+```lisp
+(car ''abracadabra)
+```
+
+To her surprise, the interpreter prints back `quote`.  Explain.
+])
+
+#answer([
+  .......my interpreter printed
+  `'quote`...........well L bozo get rekt :P.
+
+  anyways this is actually doing
+  ```lisp
+  (car (quote (quote abracadabra)))
+  ```
+  and then evaluating the first quote gives
+  ```lisp
+  (car (list quote abracadabra))
+  ```
+  and the car of the list is quote so obviously
+])
+
+#prob([
+Show how to extend the basic
+differentiator to handle more kinds of expressions.  For instance, implement
+the differentiation rule
+
+  $
+  d(u^n)/(d x) = n u^(n-1) (d u)/(d x)
+  $
+
+by adding a new clause to the `deriv` program and defining appropriate
+procedures `exponentiation?`, `base`, `exponent`, and
+`make-exponentiation`.  (You may use the symbol `**` to denote
+exponentiation.)  Build in the rules that anything raised to the power 0 is 1
+and anything raised to the power 1 is the thing itself.
+])
+
+#answer([
+racket has `(expt power base)` for exponentiation so i'll be using that\
+nvm i am stupid, i don't even need to exponentiate
+  ```lisp
+
+(define (make-exponentiation base pow)
+  (cond ((eq? pow 1) base)
+        ((eq? pow 0) 1)
+        ((eq? base 1) 1)
+        (else (list '** base pow))))
+
+(define (exponentiation? x)
+  (and (pair? x)
+       (eq? (car x) '**)))
+(define (base e) (cadr e))
+(define (exponent e) (caddr e))
+
+(define (deriv exp var)
+  (cond ((number? exp) 0)
+        ((variable? exp)
+         (if (same-variable? exp var) 1
+             0))
+        ((sum? exp)
+         (make-sum (deriv (addend exp) var)
+                   (deriv (augend exp) var)))
+        ((product? exp)
+         (make-sum
+           (make-product (multiplier exp)
+                         (deriv (multiplicand exp) var))
+           (make-product (deriv (multiplier exp) var)
+                         (multiplicand exp))))
+        ((exponentiation? exp) ;; exponentiation rule
+         (make-product (deriv (base exp) var)
+                       (make-product (exponent exp)
+                                     (make-exponentiation (base exp)
+                                                          (- (exponent exp)
+                                                             1)))))
+        (else
+          (error "unknown expression type: DERIV" exp))))
+
+(deriv (make-exponentiation 'x 7) 'x)
+; '(* 7 (** x 6))
+  ```
+])
+
+#prob([
+Extend the differentiation
+program to handle sums and products of arbitrary numbers of (two or more)
+terms.  Then the last example above could be expressed as
+
+```lisp
+(deriv '(* x y (+ x 3)) 'x)
+```
+
+Try to do this by changing only the representation for sums and products,
+without changing the `deriv` procedure at all.  For example, the
+`addend` of a sum would be the first term, and the `augend` would be
+the sum of the rest of the terms.
+])
+
+#answer([
+```lisp
+(define (augend s)
+  (if (null? (cdddr s))
+      (caddr s)
+      (cons '+ (cddr s))))
+
+(define (multiplicand p)
+  (if (null? (cdddr p))
+      (caddr p)
+      (cons '* (cddr p))))
+  ```
+  i did not come up with this solution i saw it on
+  #underline([
+    #link("https://www.inchmeal.io/sicp/ch-2/ex-2.57.html")[here]
+  ])
+
+  i was going for something like
+  ```lisp
+(define (multiplicand p)
+  (accumulate * 1 (cddr p)))
+
+(define (augend s)
+  (accumulate + 0 (cddr s)))
+  ```
+  which just.......doesn't work because then it would need to accumulate
+  nested expressions which don't work with accumulate
+  (maybe something with flatmap......)
+])
+
+#prob([
+Suppose we want to modify the
+differentiation program so that it works with ordinary mathematical notation,
+in which `+` and `*` are infix rather than prefix operators.  Since
+the differentiation program is defined in terms of abstract data, we can modify
+it to work with different representations of expressions solely by changing the
+predicates, selectors, and constructors that define the representation of the
+algebraic expressions on which the differentiator is to operate.
+
+1. Show how to do this in order to differentiate algebraic expressions presented
+in infix form, such as `(x + (3 * (x + (y + 2))))`.  To simplify the task,
+assume that `+` and `*` always take two arguments and that
+expressions are fully parenthesized.
+
+2. The problem becomes substantially harder if we allow standard algebraic
+notation, such as `(x + 3 * (x + y + 2))`, which drops unnecessary
+parentheses and assumes that multiplication is done before addition.  Can you
+design appropriate predicates, selectors, and constructors for this notation
+such that our derivative program still works?
+])
+
+#answer([
+  1.
+  ```lisp
+(define (product? x)
+  (and (pair? x)
+       (eq? (cadr x) '*)))
+(define (multiplier p) (car p))
+(define (multiplicand p) (cddr p)) ;
+
+(define (sum? x)
+  (and (pair? x)
+       (eq? (cadr x) '+))) ;2nd element of list
+(define (addend s) (car s)) ;1st element of list
+(define (augend s) (cddr s)) ;rest of all elements
+
+(define (make-sum a1 a2)
+  (cond ((=number? a1 0) a2)
+        ((=number? a2 0) a1)
+        ((and (number? a1) (number? a2))
+         (+ a1 a2))
+        (else (list a1 '+ a2)))) ;changed to match notation
+(define (make-product m1 m2)
+  (cond ((or (=number? m1 0) (=number? m2 0)) 0)
+        ((=number? m1 1) m2)
+        ((=number? m2 1) m1)
+        ((and (number? m1) (number? m2))
+         (* m1 m2))
+        (else (list m1 '* m2)))) ;changed to match notation
+  ```
+
+  2. NO I CAN'T DESIGN IT! FUCK YOU!..........this goes in TODO _sigh_
+])
+
+#prob([
 ])
