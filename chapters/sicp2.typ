@@ -290,7 +290,6 @@ repeated application of `add-1`).
 ])
 
 #answer([
-
 applying add-1 to zero will give us the value of one
 so lets do that
   ```lisp
@@ -319,6 +318,35 @@ so lets do that
 (λ (f)
    (λ (x)
      (f x))) ; this is one (this sht was so fucking ass T-T)
+  ```
+  ok bruh i also need 2
+  ```lisp
+(define one (λ (f) (λ (x) (f x))))
+(add-1 one)
+((λ (f)
+   (λ (x)
+     (f ((n f) x)))) one)
+(λ (f)
+   (λ (x)
+     (f ((one f) x))))
+(λ (f)
+   (λ (x)
+     (f (((λ (f)
+            (λ (x)
+              (f x))) f) x))))
+(λ (f)
+   (λ (x)
+     (f ((λ (x) (f x)) x))))
+(λ (f)
+   (λ (x)
+     (f (f x))))
+  ```
+  now for '+' operation
+  ```lisp
+(define (plus a b)
+  (λ (f)
+    (λ (x)
+      ((a f) ((b f) x)))))
   ```
 ])
 
@@ -1974,4 +2002,146 @@ such that our derivative program still works?
 ])
 
 #prob([
+Implement the `union-set`
+operation for the unordered-list representation of sets.
+])
+
+#answer([
+```lisp
+(define (union-set set1 set2)
+  (cond ((null? set1) set2)
+        ((null? set2) set1)
+        ((not (element-of-set? (car set1) set2))
+         (cons (car set1) (union-set (cdr set1) set2)))
+        (else (union-set (cdr set1) set2))))
+
+(union-set '(a b (1 2) x) '(c d (1 2) b))
+;; '(a x c d (1 2) b)
+  ```
+])
+
+#prob([
+We specified that a set would be
+represented as a list with no duplicates.  Now suppose we allow duplicates.
+For instance, the set $(1, 2, 3)$ could be represented as the list `(2 3 2 1
+3 2 2)`.  Design procedures `element-of-set?`, `adjoin-set`,
+`union-set`, and `intersection-set` that operate on this
+representation.  How does the efficiency of each compare with the corresponding
+procedure for the non-duplicate representation?  Are there applications for
+which you would use this representation in preference to the non-duplicate one?
+])
+
+#answer([
+  ```lisp
+; no change it is just THETA(n)
+(define (element-of-set-dup x set)
+  (cond ((null? set) false)
+        ((equal? x (car set)) true)
+        (else (element-of-set? x (cdr set)))))
+
+; no check needed so THETA(1)
+(define (adjoin-set-dup x set)
+  (cons x set))
+
+; remains unchanged and going over the set for
+; element checking each time then going to the next element
+; so complexity is THETA(n^2)
+(define (intersection-set-dup set1 set2)
+  (cond ((or (null? set1)
+             (null? set2))
+         null)
+        ((element-of-set? (car set1) set2)
+         (cons (car set1)
+               (intersection-set-dup (cdr set1) set2)))
+        (else (intersection-set-dup (cdr set1) set2))))
+
+; literally append which is THETA(n)
+(define (union-set set1 set2)
+  (cond ((null? set1) set2)
+        ((null? set2) set1)
+        (else (cons (car set1)
+                    (union-set (cdr set1) set2)))))
+  ```
+])
+
+#prob([
+Give an implementation of
+`adjoin-set` using the ordered representation.  By analogy with
+`element-of-set?` show how to take advantage of the ordering to produce a
+procedure that requires on the average about half as many steps as with the
+unordered representation.
+])
+
+#answer([
+  ```lisp
+(define (adjoin-set-order x set2)
+  (if (element-of-set-order? x set2)
+      set2
+      (cons x set2)))
+  ```
+])
+
+#prob([
+Give a $Theta(n)$
+implementation of `union-set` for sets represented as ordered lists.
+])
+
+#answer([
+  ```lisp
+(define (union-set-order set1 set2)
+  (cond ((null? set1) set2)
+        ((null? set2) set1)
+        (else (let ((x (car set1))
+                    (y (car set2)))
+                (cond ((= x y)
+                       (cons x (union-set-order (cdr set1)
+                                                (cdr set2))))
+                      ((< x y)
+                       (cons x (union-set-order (cdr set1)
+                                                set2)))
+                      ((> x y)
+                       (cons y (union-set-order set1
+                                                (cdr set2)))))))))
+
+
+(union-set-order (list 0 4 8 12) (list -4 -3 0 1 4))
+; '(-4 -3 0 1 4 8 12)
+  ```
+])
+
+#prob([
+Each of the following two
+procedures converts a binary tree to a list.
+
+```lisp
+(define (tree->list-1 tree)
+  (if (null? tree)
+      '()
+      (append 
+       (tree->list-1 
+        (left-branch tree))
+       (cons (entry tree)
+             (tree->list-1 
+              (right-branch tree))))))
+
+(define (tree->list-2 tree)
+  (define (copy-to-list tree result-list)
+    (if (null? tree)
+        result-list
+        (copy-to-list 
+         (left-branch tree)
+         (cons (entry tree)
+               (copy-to-list 
+                (right-branch tree)
+                result-list)))))
+  (copy-to-list tree '()))
+```
+
+1. Do the two procedures produce the same result for every tree?  If not, how do
+the results differ?  What lists do the two procedures produce for the trees in
+Figure 2.16?
+
+2. Do the two procedures have the same order of growth in the number of steps
+required to convert a balanced tree with $n$ elements to a list?  If not,
+which one grows more slowly?
 ])

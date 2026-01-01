@@ -223,10 +223,12 @@ following procedure:
 ])
 
 #prob([
-Ben Bitdiddle has invented a test to determine whether the interpreter he is faced with is using applicative-order evaluation or normal-order evaluation. He defines the following two procedures: ```lisp
+Ben Bitdiddle has invented a test to determine whether the interpreter he is faced with is using applicative-order evaluation or normal-order evaluation. He defines the following two procedures:
+  ```lisp
 (define (p) (p))
 (define (test x y) (if (= x 0) 0 y))
-```Then he evaluates the expression ```lisp (test 0 (p))``` What behavior will Ben observe with an interpreter that uses applicative-order evaluation? What behavior will he observe with an interpreter that uses normal-order evaluation? Explain your answer. (Assume that the evaluation rule for the special form if is the same whether the interpreter is using normal or applicative order: The predicate expression is evaluated first, and the result determines whether to evaluate the consequent or the alternative expression.
+```
+  Then he evaluates the expression ```lisp (test 0 (p))``` What behavior will Ben observe with an interpreter that uses applicative-order evaluation? What behavior will he observe with an interpreter that uses normal-order evaluation? Explain your answer. (Assume that the evaluation rule for the special form if is the same whether the interpreter is using normal or applicative order: The predicate expression is evaluated first, and the result determines whether to evaluate the consequent or the alternative expression.
 ])
 
 #answer([
@@ -273,8 +275,6 @@ What happens when Alyssa attempts to use this to compute square roots? Explain.
 in the old `(if cond A B)` the B condition would only be evaluated if cond was false
 BUT
 in the new `(new-if cond A B)` as per the definition the arguement B needs to be evaluated regardless of if the cond was false because when a function is called the first thing that Scheme does with the argument list is evaluating every single arguement
-
-#super("do you remembah? the scheme uses applicative-order for function in septembah?")
 ])
 
 #prob([
@@ -489,10 +489,10 @@ A function $f$ is defined by the rule that $f(n)=n$ if $n<3$ and $f(n)=f(n-1)+2f
   (define (f n)
     (f-it-helper 2 1 0 n))
 
-  (define (iterator a b c counter)
+  (define (f-it-helper a b c counter)
     (if (= counter 0)
         c
-        (iterator (+ a (* 2 b) (* 3 c))
+        (f-it-helper (+ a (* 2 b) (* 3 c))
                   a
                   b
                   (- counter 1))))
@@ -559,6 +559,7 @@ A function $f$ is defined by the rule that $f(n)=n$ if $n<3$ and $f(n)=f(n-1)+2f
   (count-change 11)
   ```
   $ sum_(i=a)^b 1/i(i+2) $
+  TODO
 ])
 
 #prob([
@@ -732,6 +733,7 @@ Show that if we apply such a transformation $T_(p q)$ twice, the effect is the s
   ```lisp
   ; ok fuck this i saw everywhere and everyone has a different answer? wtf?
   ```
+  TODO
 ])
 
 #prob([
