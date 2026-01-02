@@ -1,3 +1,2 @@
-test.rkt
-temp.rkt
+test*.rkt
 racket/

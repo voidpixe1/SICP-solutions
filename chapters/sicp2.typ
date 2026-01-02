@@ -396,7 +396,7 @@ a corresponding subtraction procedure, called `sub-interval`.
   Give examples to show that this is not true for multiplication or division.
 ])
 
-#answer([ optional ])
+#answer([ optional TODO ])
 
 #prob([
   Ben Bitdiddle, an expert systems
@@ -405,7 +405,7 @@ a corresponding subtraction procedure, called `sub-interval`.
   check for this condition and to signal an error if it occurs.
 ])
 
-#answer([ optional ])
+#answer([ optional TODO ])
 
 #prob([
   In passing, Ben also cryptically
@@ -415,7 +415,7 @@ a corresponding subtraction procedure, called `sub-interval`.
   suggestion.
 ])
 
-#answer([ optional ])
+#answer([ optional TODO ])
 
 #prob([
   Define a constructor
@@ -425,7 +425,7 @@ a corresponding subtraction procedure, called `sub-interval`.
   selector is the same as the one shown above.
 ])
 
-#answer([ optional ])
+#answer([ optional TODO ])
 
 #prob([
   Show that under the assumption of
@@ -435,7 +435,7 @@ a corresponding subtraction procedure, called `sub-interval`.
   positive.
 ])
 
-#answer([ optional ])
+#answer([ optional TODO ])
 
 #prob([
 Demonstrate that Lem is right.
@@ -446,7 +446,7 @@ using intervals whose width is a small percentage of the center value. Examine
 the results of the computation in center-percent form (see Exercise 2.12).
 ])
 
-#answer([ optional ])
+#answer([ optional TODO ])
 
 #prob([
 Eva Lu Ator, another user, has
@@ -458,7 +458,7 @@ she says, `par2` is a better program for parallel resistances than
 `par1`.  Is she right?  Why?
 ])
 
-#answer([ optional ])
+#answer([ optional TODO ])
 
 #prob([
   Explain, in general, why
@@ -467,7 +467,7 @@ she says, `par2` is a better program for parallel resistances than
   task impossible?  (Warning: This problem is very difficult.)
 ])
 
-#answer([ optional ])
+#answer([ optional TODO ])
 
 #prob([
   Define a procedure
@@ -2144,4 +2144,8 @@ Figure 2.16?
 2. Do the two procedures have the same order of growth in the number of steps
 required to convert a balanced tree with $n$ elements to a list?  If not,
 which one grows more slowly?
+])
+
+#answer([
+  1. yes both procedures produce the same result for every tree
 ])
