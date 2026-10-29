@@ -1,11 +1,11 @@
 #set page(
   numbering: "[1]",
-  margin: 3em,
+  margin: 2em,
 )
 
 #set text(
   font: "Libertinus Serif",
-  size: 13pt,
+  size: 14pt,
 )
 
 #show math.equation.where(block: false): set math.frac(style: "horizontal")

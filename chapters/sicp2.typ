@@ -13,7 +13,7 @@
   block(
     width: 100%,
     inset: 1em,
-    stroke:black,
+    stroke: black,
     body
   )
 }
@@ -47,10 +47,6 @@
 
 = SECTION 2
 
-#notes([
-  say gex
-])
-
 #prob([
   Define a better version of
   `make-rat` that handles both positive and negative arguments.
@@ -60,7 +56,6 @@
 ])
 
 #answer([
-  idk how........but uhhhhhh........this _automatically_ works in racket with.......definition as is
   ```lisp
 (define (make-rat n d)
   (cond ((< d 0) (make-rat (- n) (- d)))
@@ -160,7 +155,6 @@ endpoints).  To try your procedures, you'll need a way to print points:
 
 #answer([
   ok so this is basically just asking us to make a rectangle given two points\
-  god this is tedious
 
   ```lisp
 (define (make-point x y)
@@ -189,9 +183,7 @@ endpoints).  To try your procedures, you'll need a way to print points:
 (perimeter (make-rect (make-point 0 0) (make-point 3 3)))
 ;12
   ```
-  ehhh idk? is this ok?
 
-  now.......how tf are they asking me to make _implement a different representation for rectangles_ -w-
 ])
 
 #prob([
@@ -228,7 +220,6 @@ endpoints).  To try your procedures, you'll need a way to print points:
 (cdr (cons 3 4))
 ; 4
   ```
-  first try ezz
 ])
 
 #prob([
@@ -504,7 +495,7 @@ reverse order:
 ])
 
 #answer([
-  THE PROBLEM!!! THE ONE AND ONLY!!! THE INTERVIEW PROBLEM!!!!\
+  _"Reverse a linked list on the whiteboard"_
   ```lisp
 (define (reverse l)
   (if (null? l)
@@ -670,7 +661,7 @@ even-odd parity as the first argument.  For example,
 (same-parity 8 2 3 4 5 6)
 ; '(6 4 2)
   ```
-  ok so this is giving the solution  in reverse, and i know the reason BUT idk how to make append such that it appends a pair and a "non-pair" without messing up the tree
+  this is giving the solution  in reverse, and i know the reason BUT idk how to make append such that it appends a pair and a "non-pair" without messing up the tree
 ])
 
 #prob([
@@ -850,7 +841,7 @@ and `cdr`s that will pick 7 from each of the following lists:
                 (car
                   (cdr
                     (car
-                      (cdr l3)))))))))))) ;(what even is this question bro XD)
+                      (cdr l3)))))))))))) ;(what even is this question bro)
   ```
 ])
 
@@ -1015,7 +1006,35 @@ representation?
 ])
 
 #answer([
-  TODO (it's easy........i think)
+  ```lisp
+(define (make-mobile left right)
+  (list left right))
+(define (left-branch m) (car m))
+(define (right-branch m) (car (cdr m)))
+
+(define (make-branch length structure)
+  (list length structure))
+(define (branch-length branch) (car branch))
+(define (branch-structure branch) (car (cdr branch)))
+
+(define (total-weight mobile)
+  (if (not (pair? mobile))
+      mobile
+      (+ (total-weight (branch-structure (left-branch mobile)))
+         (total-weight (branch-structure (right-branch mobile))))))
+
+(define (torque m)
+  (- (* (branch-length (left-branch m)) 
+        (total-weight (branch-mobile (left-branch m))))
+     (* (branch-length (right-branch m))
+        (total-weight (branch-mobile (right-branch m))))))
+
+(define (balanced? m)
+  (if (pair? mobile)
+      (and (balanced? (branch-structure (left-branch m)))
+           (balanced? (branch-structure (right-branch m))))
+      true))
+  ```
 ])
 
 #prob([
@@ -1567,7 +1586,7 @@ HOLY SHIT this one took a long while
 ])
 
 #answer([
-
+  TODO
 ])
 
 #prob([
@@ -1595,6 +1614,7 @@ the program in Exercise 2.42 solves the puzzle in time $T$.
 
 #answer([
   FUCK
+  TODO
 ])
 
 #prob([
@@ -1605,6 +1625,7 @@ Define the procedure
 ])
 
 #answer([
+  TODO
 ])
 
 #prob([
@@ -1622,6 +1643,7 @@ behaviors as the ones already defined.
 ])
 
 #answer([
+  TODO
 ])
 
 #prob([
@@ -1642,6 +1664,7 @@ $
 ])
 
 #answer([
+  TODO
 ])
 
 #prob([
@@ -1661,6 +1684,7 @@ implementation for frames.
 ])
 
 #answer([
+  TODO
 ])
 
 #prob([
@@ -1673,6 +1697,7 @@ Exercise 2.46 to define a representation for segments with a constructor
 ])
 
 #answer([
+  TODO
 ])
 
 #prob([
@@ -1690,6 +1715,7 @@ of the frame.
 ])
 
 #answer([
+  TODO
 ])
 
 #prob([
@@ -1699,6 +1725,7 @@ rotate painters counterclockwise by 180 degrees and 270 degrees.
 ])
 
 #answer([
+  TODO
 ])
 
 #prob([
@@ -1712,6 +1739,7 @@ rotation operations (from Exercise 2.50).
 ])
 
 #answer([
+  TODO
 ])
 
 #prob([
@@ -1732,6 +1760,7 @@ the big Mr. Rogers look outward from each corner of the square.)
 ])
 
 #answer([
+  TODO
 ])
 
 #prob([
@@ -1767,7 +1796,7 @@ in response to evaluating each of the following expressions?
 ;; '(red shoes blue socks)
   ```
 
-  .....it is correct :>
+  .....it is correct `:>`
 ])
 
 #prob([
@@ -1828,7 +1857,7 @@ To her surprise, the interpreter prints back `quote`.  Explain.
 
 #answer([
   .......my interpreter printed
-  `'quote`...........well L bozo get rekt :P.
+  `'quote`...........welp `:P`.
 
   anyways this is actually doing
   ```lisp
@@ -2148,4 +2177,66 @@ which one grows more slowly?
 
 #answer([
   1. yes both procedures produce the same result for every tree
+  2. BUT the `tree->list-1` actually takes $Theta(log(n) n)$ time while the `tree->list-2` takes $Theta(n)$
+  because it `appends` the list everytime after going through the tree
+])
+
+#prob([
+The following procedure
+`list->tree` converts an ordered list to a balanced binary tree.  The
+helper procedure `partial-tree` takes as arguments an integer $n$ and
+list of at least $n$ elements and constructs a balanced tree containing the
+first $n$ elements of the list.  The result returned by `partial-tree`
+is a pair (formed with `cons`) whose `car` is the constructed tree
+and whose `cdr` is the list of elements not included in the tree.
+
+```lisp
+(define (list->tree elements)
+  (car (partial-tree 
+        elements (length elements))))
+
+(define (partial-tree elts n)
+  (if (= n 0)
+      (cons '() elts)
+      (let ((left-size 
+             (quotient (- n 1) 2)))
+        (let ((left-result (partial-tree elts left-size)))
+          (let ((left-tree (car left-result))
+                (non-left-elts (cdr left-result))
+                (right-size (- n (+ left-size 1))))
+            (let ((this-entry (car non-left-elts))
+                  (right-result (partial-tree (cdr non-left-elts) right-size)))
+              (let ((right-tree (car right-result))
+                    (remaining-elts (cdr right-result)))
+                (cons (make-tree this-entry 
+                                 left-tree 
+                                 right-tree)
+                      remaining-elts))))))))
+```
+
+1. Write a short paragraph explaining as clearly as you can how
+`partial-tree` works.  Draw the tree produced by `list->tree` for
+the list `(1 3 5 7 9 11)`.
+
+2. What is the order of growth in the number of steps required by
+`list->tree` to convert a list of $n$ elements?
+])
+
+#answer([
+  ```lisp
+(define (partial-tree elts n)
+  (if (= n 0)
+      (cons '() elts)
+      (let* ((left-size (quotient (- n 1) 2))
+             (left-result (partial-tree elts left-size))
+             (left-tree (car left-result))
+             (non-left-elts (cdr left-result))
+             (right-size (- n (+ left-size 1)))
+             (this-entry (car non-left-elts))
+             (right-result (partial-tree (cdr non-left-elts) right-size))
+             (right-tree (car right-result))
+             (remaining-elts (cdr right-result)))
+        (cons (make-tree this-entry left-tree right-tree) remaining-elts))))
+  ```
+  i found this in #underline([ #link("https://zthomae.github.io/sicp/")[here]])
 ])

@@ -12,7 +12,7 @@
     breakable: false,
     width: 100%,
     inset: 1em,
-    stroke:black,
+    stroke: black,
     body
   )
 }
@@ -31,6 +31,7 @@
     width: 100%,
     inset: 1em,
     fill: luma(240),
+    stroke: 1pt,
     body
   )
 }
@@ -177,7 +178,7 @@
 
 #prob([
   Translate the following expression into prefix 
-  #image( "../images/1-2.png", width: 30%,format: "png" )
+  $ (5+4+(2-(3-(6+4 / 5)))) / (3(6-2)(2-7)) $
 ])
 
 #answer([
@@ -526,7 +527,7 @@ A function $f$ is defined by the rule that $f(n)=n$ if $n<3$ and $f(n)=f(n-1)+2f
 #prob([
   Prove that $"fib"(n)$ is the closest integer to $phi^n/sqrt(5)$ where $phi=(1+sqrt(5))/2.$
 
-  Hint: Let $psi=(1 sqrt(5))/2.$ Use induction and the definition of the Fibonacci numbers to prove that $"Fib"(n)=(phi^n-psi^n)/sqrt(5).$
+  Hint: Let $psi=(1-sqrt(5))/2.$ Use induction and the definition of the Fibonacci numbers to prove that $"Fib"(n)=(phi^n-psi^n)/sqrt(5).$
 ])
 
 #answer([
@@ -559,8 +560,7 @@ A function $f$ is defined by the rule that $f(n)=n$ if $n<3$ and $f(n)=f(n-1)+2f
            ((= kinds-of-coins 5) 50))) 
   (count-change 11)
   ```
-  $ sum_(i=a)^b 1/i(i+2) $
-  TODO
+  ok no i am not doing the drawing the whole graph
 ])
 
 #prob([
@@ -726,15 +726,35 @@ Show that if we apply such a transformation $T_(p q)$ twice, the effect is the s
 ])
 
 #answer([
-  - for normal order evaluation it will be
+  *Normal-order-evaluation:* expanding the computation until we get soemthing with primitive operators
   ```lisp
-  ;i AM NOT WRITING THAT WTF it will take ages bro
+(if (= 40 0)
+  (206 (remainder 206 40))
+  (if (= 6 0)
+    (40 (remainder 40 6))
+    (if (= 4 0)
+      (6 (remainder 6 4))
+      (if (= 2 0)
+        (4 (remainder 4 2))
+        (if (= 0 0)
+          2 (remainder 2 0)))
   ```
-  - for applicative order of evaluation
+
+  *Applicative-order-evaluation:* evaluate the args and then apply the procedure
+
   ```lisp
-  ; ok fuck this i saw everywhere and everyone has a different answer? wtf?
+(if (= 40 0)
+  (206 (remainder 206 40))
+  (if (= 6 0)
+    (40 (remainder 40 6))
+    (if (= 4 0)
+      (6 (remainder 6 4))
+      (if (= 2 0)
+        (4 (remainder 4 2))
+        (if (= 0 0)
+          2 (remainder 2 0)))
   ```
-  TODO
+
 ])
 
 #prob([
@@ -1003,7 +1023,7 @@ rather than calling square:
   if we use ```lisp (square (expmod base (/ exp 2) m))``` then firstly we would've done then (expmod base (/ exp 2) m) and then $"(square <result> <result>)"$
   so we would've evaluated (expmod) ONCE every cycle
 
-  but if we do ```lisp(* (expmod base (/ exp 2) m) (expmod base (/ exp 2) m))``` then we need to calculate (expmod) TWICE which means that for every 
+  but if we do ```lisp (* (expmod base (/ exp 2) m) (expmod base (/ exp 2) m))``` then we need to calculate (expmod) TWICE which means that for every 
 ])
 
 #prob([
@@ -1011,14 +1031,7 @@ rather than calling square:
 ])
 
 #answer([
-  Numbers that fool the Fermat test are called Carmichael numbers, and lile is
-  known about them other than that they are extremely rare. ere are 255 Carmichael
-  numbers below 100,000,000. e smallest few are 561, 1105, 1729, 2465, 2821, and 6601.
-  In testing primality of very large numbers chosen at random, the chance of stumbling
-  upon a value that fools the Fermat test is less than the chance that cosmic radiation will
-  cause the computer to make an error in carrying out a “correct” algorithm. Considering
-  an algorithm to be inadequate for the first reason but not for the second illustrates the
-  difference between mathematics and engineering.
+  TODO
 ])
 
 #prob([
@@ -1096,11 +1109,11 @@ where $h = (b −a)/n$, for some even integer $n$, and $y_k = f (a + k h).$ (Inc
 (integral square 0 1 1000.00)
 ;0.33333333333333326
   ```
-  HOLY SHIT THIS TOOK ME A WHOLE DAY TO DO, i have no idea about calc 1 i guess ;-; also just discovered that you need double decimal digits after the number to get accurate decimal places :P
+  HOLY SHIT THIS TOOK ME A WHOLE DAY TO DO, i have no idea about calc 1 i guess `;-;` also just discovered that you need double decimal digits after the number to get accurate decimal places `:P`
 ])
 
 #prob([
-e sum procedure above generates a linear recursion. e procedure can be rewrien so that the sum is performed iteratively. Show how to do this by filling in the missing expressions in the following definition:
+the sum procedure above generates a linear recursion. the procedure can be rewritten so that the sum is performed iteratively. Show how to do this by filling in the missing expressions in the following definition:
   ```lisp
   (define (sum term a next b)
     (define (iter a result)
@@ -1123,7 +1136,7 @@ where $h = (b −a)/n$, for some even integer $n$, and $y_k = f (a + k h).$ (Inc
 ])
 
 #prob([
-  - e sum procedure is only the simplest of a vast number of similar abstractions that can be captured as higher-order procedures. Write an analogous procedure called product that returns the product of the values of a function at points over a given range. Show how to define factorial in terms of product. Also use product to compute approximations to $pi$ using the formula.
+  - The sum procedure is only the simplest of a vast number of similar abstractions that can be captured as higher-order procedures. Write an analogous procedure called product that returns the product of the values of a function at points over a given range. Show how to define factorial in terms of product. Also use product to compute approximations to $pi$ using the formula.
   $ pi/4 = (2.4.4.6.6.8...)/(3.3.5.5.7.7...) $
   - If your product procedure generates a recursive process, write one that generates an iterative process. If it generates an iterative process, write one that generates a recursive process.
 ])
@@ -1240,8 +1253,9 @@ Show how to express the following using filtered-accumulate:
 ])
 
 #answer([
-  i don't even understand wtf this question is asking me to do tbh ;-;
-  what is a filter :'D
+  i don't even understand wtf this question is asking me to do tbh `;-;`
+  what is a filter `:'D`
+  TODO
 ])
 
 #prob([
@@ -1443,8 +1457,7 @@ application: not a procedure;
   *1.* An infinite continued fraction is an expression of the form 
   $ N_1 / (D_1 + N_2 / (D_2 + N_3 / (D_3 + dots.h))) $
   As an example, one can show that the infinite continued fraction expansion with the $N_i$ and the $D_i$ all equal to 1 produces $1 / phi$, where $phi$ is the golden ratio (described in 1.2.2).  One way to approximate an infinite continued fraction is to truncate the expansion after a given number of terms.  Such a truncation--a so-called k-term finite continued fraction--has the form 
-$ frac(
-  N_1,
+$ frac( N_1,
   D_1 + frac(
     N_2,
     dots.h + frac(N_k, D_k)
@@ -1507,7 +1520,6 @@ $ frac(
 (approx-e 100)
 ;2.7182818284590455
   ```
-  first try 😎 [me when the modular arithmetic]
 ])
 
 #prob([
@@ -1531,7 +1543,6 @@ $ frac(
 (tan-sus 3.14 10)
 -0.0005926555452557651
   ```
-  huh...........pretty good....i guess? idk?
 ])
 
 #prob([
@@ -1593,7 +1604,6 @@ to approximate zeros of the cubic $x^3 + a x^2 + b x + c$.
 ])
 
 #answer([
-  `first try 😎 hehehe`
 ```lisp
 (define (inc x)
   (+ 1 x))
@@ -1637,7 +1647,6 @@ to approximate zeros of the cubic $x^3 + a x^2 + b x + c$.
 ])
 
 #answer([
-  shrimple 🦐
   ```lisp
 (define (compose a b)
   (lambda (s) (a (b s))))
@@ -1729,6 +1738,7 @@ to approximate zeros of the cubic $x^3 + a x^2 + b x + c$.
 
 #answer([
 i don't even understand wtf i need to do
+
   TODO
 ])
 
